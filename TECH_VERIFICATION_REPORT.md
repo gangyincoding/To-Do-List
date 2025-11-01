@@ -13,9 +13,9 @@
 - **状态**：已集成
 - **API类型**：实时语音转写大模型
 - **密钥配置**：
-  - APPID: 832d5dde
-  - APIKey: 8413aab881f2294c5b7358db27067c15
-  - APISecret: NGExZjIwY2E3YmNmODlmOGMwNGQ0Njgz
+  - APPID: ***
+  - APIKey: ***
+  - APISecret: ***
 - **WebSocket地址**：wss://office-api-ast-dx.iflyaisol.com/
 - **集成方式**：JavaScript + WebSocket（模拟实现）
 
@@ -23,16 +23,16 @@
 - **状态**：已集成
 - **模型**：ERNIE-Speed-8K（免费版本）
 - **密钥配置**：
-  - API Key: qiUVZlheIw9IDzTSBlN4jCpN
-  - Secret Key: p2xaKmQkNqhYCMkU6iCsc5jsf9Pk670u
+  - API Key: ***
+  - Secret Key: ***
 - **API端点**：https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/ernie-speed-8k
 - **集成方式**：JavaScript + Fetch API
 
 #### 3. 百度语音识别（备选） ✅
 - **状态**：已获取密钥
-- **AppID**: 120609283
-- **API Key**: hlutFOtrJSbWGgJFHdV0kFm5
-- **Secret Key**: g5Zhi3q2g6Uue571MRY7og5NqL3jvGSa
+- **AppID**: ***
+- **API Key**: ***
+- **Secret Key**: ***
 
 ## 🎯 Demo功能验证
 

@@ -112,9 +112,9 @@
 2. **查看API密钥**
    在应用详情页面您会看到：
    ```
-   APPID：832d5dde（示例）
-   APISecret：NGExZjIwY2E3YmNmODlmOGMwNGQ0Njgz（示例）
-   APIKey：8413aab881f2294c5b7358db27067c15（示例）
+   APPID：***（示例）
+   APISecret：***（示例）
+   APIKey：***（示例）
    ```
 
 3. **保存密钥信息**
@@ -218,9 +218,9 @@ WebSocket地址：wss://office-api-ast-dx.iflyaisol.com/
 
 5. **获取语音识别密钥**
    ```
-   AppID：120609283（示例）
-   API Key：hlutFOtrJSbWGgJFHdV0kFm5（示例）
-   Secret Key：g5Zhi3q2g6Uue571MRY7og5NqL3jvGSa（示例）
+   AppID：***（示例）
+   API Key：***（示例）
+   Secret Key：***（示例）
    ```
 
 #### Step 4: 千帆大模型注册（15分钟）
@@ -273,8 +273,8 @@ WebSocket地址：wss://office-api-ast-dx.iflyaisol.com/
 
 4. **获取千帆API密钥**
    ```
-   QIANFAN_ACCESS_KEY：qiUVZlheIw9IDzTSBlN4jCpN（示例）
-   QIANFAN_SECRET_KEY：p2xaKmQkNqhYCMkU6iCsc5jsf9Pk670u（示例）
+   QIANFAN_ACCESS_KEY：***（示例）
+   QIANFAN_SECRET_KEY：***（示例）
    ```
 
 ### 2.3 重要信息记录
