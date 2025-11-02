@@ -1,0 +1,241 @@
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>TaskAI - 录音界面</title>
+    <script src="https://res.gemcoder.com/js/reload.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+                  theme: {
+                      extend: {
+                          colors: {
+                              primary: '#667eea',
+                              secondary: '#764ba2',
+                              darkbg: '#1a1a1a',
+                              recordred: '#ef4444',
+                              recordredlight: '#dc2626',
+                              waveform: '#3b82f6'
+                          },
+                          spacing: {
+                              '160': '40rem',
+                          },
+                          boxShadow: {
+                              'button': '0 10px 25px -5px rgba(239, 68, 68, 0.4)',
+                          }
+                      }
+                  }
+              }
+    </script>
+    <style type="text/tailwindcss">
+      @layer utilities {
+          .content-auto {
+              content-visibility: auto;
+          }
+          .bg-gradient-record {
+              background-image: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+          }
+          .text-shadow {
+              text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          }
+          .waveform-animation span {
+              animation: wave 1.5s infinite ease-in-out;
+              display: inline-block;
+              width: 4px;
+              margin: 0 2px;
+              border-radius: 2px;
+              background-color: #3b82f6;
+          }
+          @keyframes wave {
+              0%, 100% {
+                  height: 10px;
+              }
+              50% {
+                  height: 40px;
+              }
+          }
+          .waveform-animation span:nth-child(2) { animation-delay: 0.1s; }
+          .waveform-animation span:nth-child(3) { animation-delay: 0.2s; }
+          .waveform-animation span:nth-child(4) { animation-delay: 0.3s; }
+          .waveform-animation span:nth-child(5) { animation-delay: 0.4s; }
+          .waveform-animation span:nth-child(6) { animation-delay: 0.5s; }
+          .waveform-animation span:nth-child(7) { animation-delay: 0.4s; }
+          .waveform-animation span:nth-child(8) { animation-delay: 0.3s; }
+          .waveform-animation span:nth-child(9) { animation-delay: 0.2s; }
+          .waveform-animation span:nth-child(10) { animation-delay: 0.1s; }
+      }
+    </style>
+  </head>
+  <body class="bg-white min-h-screen text-gray-800 flex flex-col">
+    <!-- [MODULE] abc_主内容区域 -->
+    <div class="flex flex-col h-screen">
+      <!-- [MODULE] d23_顶部导航栏 -->
+      <header
+        class="h-16 flex items-center justify-between px-6 pt-8 bg-white shadow-sm"
+      >
+        <!-- [MODULE] 56h_顶部导航栏:取消按钮 -->
+        <div>
+          <button
+            class="text-gray-800 hover:text-gray-500 transition-colors"
+            id="cancel-button"
+          >
+            <span class="text-lg font-medium"> 取消 </span>
+          </button>
+        </div>
+        <!-- [/MODULE] 56h_顶部导航栏:取消按钮 -- 点击返回主页面 -->
+        <!-- [MODULE] 33f_顶部导航栏:录音状态 -->
+        <div class="flex items-center">
+          <span class="text-lg font-medium text-gray-800"> 正在录音... </span>
+        </div>
+        <!-- [/MODULE] 33f_顶部导航栏:录音状态 -- 显示当前录音状态 -->
+        <!-- [MODULE] 45g_顶部导航栏:暂停按钮 -->
+        <div>
+          <button
+            class="text-gray-800 hover:text-gray-500 transition-colors"
+            id="pause-button"
+          >
+            <span class="text-lg font-medium pause-text"> 暂停 </span>
+          </button>
+        </div>
+        <!-- [/MODULE] 45g_顶部导航栏:暂停按钮 -- 点击暂停录音 -->
+      </header>
+      <!-- [/MODULE] d23_顶部导航栏 -- 包含取消按钮、录音状态和暂停按钮 -->
+      <!-- [MODULE] e7h_中间内容区域 -->
+      <main class="flex-grow flex flex-col items-center justify-center px-6">
+        <!-- [MODULE] f8j_中间内容区域:录音时长 -->
+        <div class="mb-16 text-center">
+          <div class="text-6xl font-bold text-gray-800" id="recording-time">
+            00:00
+          </div>
+        </div>
+        <!-- [/MODULE] f8j_中间内容区域:录音时长 -- 显示当前录音时长，大字体突出显示 -->
+        <!-- [MODULE] g9k_中间内容区域:音频波形 -->
+        <div class="waveform-animation mb-20" id="waveform-animation">
+          <span> </span>
+          <span> </span>
+          <span> </span>
+          <span> </span>
+          <span> </span>
+          <span> </span>
+          <span> </span>
+          <span> </span>
+          <span> </span>
+          <span> </span>
+        </div>
+        <!-- [/MODULE] g9k_中间内容区域:音频波形 -- 显示音频波形动画，直观展示录音状态 -->
+        <!-- [MODULE] h0l_中间内容区域:状态提示 -->
+        <div class="text-center text-gray-600 text-lg" id="status-message">
+          <p>正在录制音频</p>
+        </div>
+        <!-- [/MODULE] h0l_中间内容区域:状态提示 -- 显示当前录音状态的文字说明 -->
+      </main>
+      <!-- [/MODULE] e7h_中间内容区域 -- 显示录音时长、音频波形和状态提示，使用大量留白突出录音状态 -->
+      <!-- [MODULE] i1m_底部操作区域 -->
+      <footer class="h-64 flex flex-col items-center justify-center mb-12">
+        <!-- [MODULE] j2n_底部操作区域:停止录音按钮 -->
+        <button
+          class="w-36 h-36 rounded-full bg-[#1e40af] flex items-center justify-center shadow-lg shadow-[#1e40af]/30 transition-all duration-300 hover:shadow-xl hover:shadow-[#1e40af]/40 active:scale-95 mb-6 transform hover:-translate-y-1"
+          id="stop-button"
+        >
+          <i
+            class="fas fa-stop text-white text-4xl transition-transform duration-200 active:scale-80"
+          >
+          </i>
+        </button>
+        <!-- [/MODULE] j2n_底部操作区域:停止录音按钮 -- 点击停止录音，圆形大按钮突出显示 -->
+        <!-- [MODULE] k3o_底部操作区域:按钮文字说明 -->
+        <div class="text-gray-800 font-medium mb-1">点击停止录音</div>
+        <!-- [/MODULE] k3o_底部操作区域:按钮文字说明 -- 说明停止录音按钮的功能 -->
+      </footer>
+      <!-- [/MODULE] i1m_底部操作区域 -- 包含停止录音按钮和功能说明文字 -->
+    </div>
+    <!-- [/MODULE] abc_主内容区域 -- TaskAI录音界面，包含导航栏、录音时长、音频波形和停止录音操作区 -->
+    <!-- [JSMOD] l4p_录音功能 -->
+    <script id="recording-script">
+      document.addEventListener('DOMContentLoaded', () => {
+                  // 录音状态变量
+                  let isRecording = true;
+                  let isPaused = false;
+                  let recordingSeconds = 0;
+                  let recordingInterval;
+
+                  // DOM元素
+                  const recordingTimeElement = document.getElementById('recording-time');
+                  const cancelButton = document.getElementById('cancel-button');
+                  const pauseButton = document.getElementById('pause-button');
+                  const stopButton = document.getElementById('stop-button');
+                  const waveformElement = document.getElementById('waveform-animation');
+                  const statusMessageElement = document.getElementById('status-message');
+                  const pauseTextElement = document.querySelector('.pause-text');
+
+                  // 开始录音计时
+                  startRecordingTimer();
+
+                  // 格式化时间（秒 -> MM:SS）
+                  function formatTime(seconds) {
+                      const mins = Math.floor(seconds / 60);
+                      const secs = seconds % 60;
+                      return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                  }
+
+                  // 开始录音计时器
+                  function startRecordingTimer() {
+                      recordingInterval = setInterval(() => {
+                          if (!isPaused) {
+                              recordingSeconds++;
+                              recordingTimeElement.textContent = formatTime(recordingSeconds);
+                          }
+                      }, 1000);
+                  }
+
+                  // 暂停/继续录音
+                  pauseButton.addEventListener('click', () => {
+                      isPaused = !isPaused;
+
+                      if (isPaused) {
+                          pauseTextElement.textContent = '继续';
+                          waveformElement.style.opacity = '0.5';
+                          statusMessageElement.innerHTML = '<p>录音已暂停</p>';
+                      } else {
+                          pauseTextElement.textContent = '暂停';
+                          waveformElement.style.opacity = '1';
+                          statusMessageElement.innerHTML = '<p>正在录制音频</p>';
+                      }
+                  });
+
+                  // 取消录音
+                  cancelButton.addEventListener('click', () => {
+                      // 停止计时器
+                      clearInterval(recordingInterval);
+
+                      // 在实际应用中，这里应该跳转到主页面
+                      if (confirm('确定要取消录音吗？已录制的内容将不会保存。')) {
+                          window.location.href = 'javascript:void(0);';
+                      }
+                  });
+
+                  // 停止录音
+                  stopButton.addEventListener('click', () => {
+                      // 停止计时器
+                      clearInterval(recordingInterval);
+
+                      // 在实际应用中，这里应该处理录音完成后的逻辑
+                      alert(`录音已完成，时长: ${formatTime(recordingSeconds)}`);
+
+                      // 模拟跳转到处理界面
+                      window.location.href = 'javascript:void(0);';
+                  });
+
+                  // 监听窗口大小变化，调整元素位置
+                  window.addEventListener('resize', () => {
+                      // 可以在这里添加响应式调整逻辑
+                  });
+              });
+    </script>
+    <!-- [/JSMOD] l4p_录音功能 -- 实现录音计时、暂停/继续、取消和停止录音功能，以及音频波形动画控制 -->
+  </body>
+</html>

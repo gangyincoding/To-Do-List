@@ -1,0 +1,346 @@
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>TaskAI</title>
+    <script src="https://res.gemcoder.com/js/reload.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+                  theme: {
+                      extend: {
+                          colors: {
+                              primary: '#667eea',
+                              secondary: '#764ba2',
+                              task: '#fff3cd',
+                          },
+                          spacing: {
+                              '160': '40rem',
+                          },
+                          boxShadow: {
+                              'button': '0 10px 25px -5px rgba(102, 126, 234, 0.4)',
+                          }
+                      }
+                  }
+              }
+    </script>
+    <style type="text/tailwindcss">
+      @layer utilities {
+          .content-auto {
+              content-visibility: auto;
+          }
+          .bg-gradient-primary {
+              background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          }
+          .text-shadow {
+              text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          }
+          .task-card {
+              @apply bg-task rounded-2xl p-5 shadow-md max-w-md mx-auto;
+          }
+          .recording-button {
+              @apply w-40 h-40 rounded-full bg-gradient-primary flex items-center justify-center shadow-button transition-transform duration-200 active:scale-95;
+          }
+      }
+    </style>
+  </head>
+  <body class="bg-white min-h-screen flex flex-col">
+    <!-- [MODULE] abc_主内容区域 -->
+    <div class="flex flex-col h-screen">
+      <!-- [MODULE] d23_顶部导航栏 -->
+      <header class="h-16 flex items-center justify-between px-6">
+        <!-- [MODULE] 56h_顶部导航栏:任务列表按钮 -->
+        <div>
+          <button
+            class="text-gray-500 hover:text-gray-800 transition-colors"
+            id="task-list-button"
+          >
+            <i class="fas fa-tasks text-lg"> </i>
+          </button>
+        </div>
+        <!-- [/MODULE] 56h_顶部导航栏:任务列表按钮 -- 点击查看全部任务列表 -->
+        <!-- [MODULE] 33f_顶部导航栏:应用标题 -->
+        <div
+          class="flex items-center absolute left-1/2 transform -translate-x-1/2"
+        >
+          <span class="text-xl font-bold mr-2"> 🎤 </span>
+          <span class="text-xl font-bold text-gray-800"> TaskAI </span>
+        </div>
+        <!-- [/MODULE] 33f_顶部导航栏:应用标题 -- 显示应用图标和名称 -->
+        <!-- [MODULE] 45g_顶部导航栏:设置按钮 -->
+        <div>
+          <button class="text-gray-500 hover:text-gray-800 transition-colors">
+            <i class="fas fa-cog text-lg"> </i>
+          </button>
+        </div>
+        <!-- [/MODULE] 45g_顶部导航栏:设置按钮 -- 点击打开应用设置页面 -->
+      </header>
+      <!-- [/MODULE] d23_顶部导航栏 -- 包含应用标题和设置按钮 -->
+      <!-- [MODULE] e7h_中间内容区域 -->
+      <main
+        class="flex-grow flex flex-col items-center justify-center px-6 pb-8"
+      >
+        <!-- [MODULE] f8j_中间内容区域:任务提醒卡片 -->
+        <div
+          class="task-card mb-16 border-l-4 border-red-500 relative text-center"
+        >
+          <div
+            class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded"
+          >
+            紧急
+          </div>
+          <div class="text-gray-700 text-lg font-medium">下午2点开会</div>
+          <div class="text-red-500 mt-1 font-medium">⏰ 还剩2小时</div>
+        </div>
+        <!-- [/MODULE] f8j_中间内容区域:任务提醒卡片 -- 显示最近的任务提醒，包含任务内容和剩余时间 -->
+      </main>
+      <!-- [/MODULE] e7h_中间内容区域 -- 显示任务提醒卡片，使用大量留白突出重要内容 -->
+      <!-- [MODULE] g9k_底部操作区域 -->
+      <footer class="h-64 flex flex-col items-center justify-center mb-12">
+        <!-- [MODULE] h0l_底部操作区域:录音按钮 -->
+        <button
+          class="recording-button mb-6 w-48 h-48 rounded-full"
+          id="record-button"
+        >
+          <i class="fas fa-microphone text-white text-5xl"> </i>
+        </button>
+        <!-- [/MODULE] h0l_底部操作区域:录音按钮 -- 点击开始语音输入，进行任务创建或管理 -->
+        <!-- [MODULE] i1m_底部操作区域:按钮文字说明 -->
+        <div class="text-gray-600 font-medium mb-1">点击说话</div>
+        <div class="text-gray-400 text-sm">AI自动拆分任务</div>
+        <!-- [/MODULE] i1m_底部操作区域:按钮文字说明 -- 说明录音按钮功能和AI任务拆分能力 -->
+      </footer>
+      <!-- [/MODULE] g9k_底部操作区域 -- 包含录音按钮和功能说明文字 -->
+    </div>
+    <!-- [/MODULE] abc_主内容区域 -- TaskAI应用主界面，包含导航栏、任务提醒和录音操作区 -->
+    <!-- [JSMOD] j2n_录音功能 -->
+    <script id="recording-script">
+      document.addEventListener('DOMContentLoaded', () => {
+                  const recordButton = document.getElementById('record-button');
+                  let isRecording = false;
+
+                  // 录音按钮点击效果
+                  recordButton.addEventListener('click', () => {
+                      isRecording = !isRecording;
+
+                      if (isRecording) {
+                          // 开始录音效果
+                          recordButton.classList.add('animate-pulse');
+                          recordButton.innerHTML = `
+
+
+
+
+
+
+      <i class="fas fa-stop text-white text-4xl">
+      </i>
+
+
+
+
+
+
+      `;
+
+                          // 模拟录音功能
+                          simulateRecording();
+                      } else {
+                          // 停止录音效果
+                          recordButton.classList.remove('animate-pulse');
+                          recordButton.innerHTML = `
+
+
+
+
+
+
+      <i class="fas fa-microphone text-white text-4xl">
+      </i>
+
+
+
+
+
+
+      `;
+                      }
+                  });
+
+                  // 模拟录音功能
+                  function simulateRecording() {
+                      // 这里只是UI模拟，实际应用中需要调用录音API
+                      setTimeout(() => {
+                          // 5秒后自动停止录音
+                          isRecording = false;
+                          recordButton.classList.remove('animate-pulse');
+                          recordButton.innerHTML = `
+
+
+
+
+
+
+      <i class="fas fa-microphone text-white text-4xl">
+      </i>
+
+
+
+
+
+
+      `;
+
+                          // 显示录音完成提示
+                          showNotification('录音已完成，正在处理您的任务...');
+                      }, 5000);
+                  }
+
+                  // 显示通知提示
+                  function showNotification(message) {
+                      // 创建通知元素
+                      const notification = document.createElement('div');
+                      notification.className = 'fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+                      notification.textContent = message;
+
+                      // 添加到页面
+                      document.body.appendChild(notification);
+
+                      // 3秒后移除
+                      setTimeout(() => {
+                          notification.classList.add('opacity-0', 'transition-opacity', 'duration-500');
+                          setTimeout(() => {
+                              document.body.removeChild(notification);
+                          }, 500);
+                      }, 3000);
+                  }
+
+                  // 监听窗口大小变化，调整元素位置
+                  window.addEventListener('resize', () => {
+                      // 可以在这里添加响应式调整逻辑
+                  });
+              });
+    </script>
+    <!-- [/JSMOD] j2n_录音功能 -- 实现录音按钮的点击交互效果，包括状态切换、动画效果和模拟录音功能，以及录音完成后的通知提示 -->
+    <!-- [JSMOD] k3o_任务列表功能 -->
+    <script id="task-list-script">
+      document.addEventListener('DOMContentLoaded', () => {
+                  const taskListButton = document.getElementById('task-list-button');
+
+                  // 创建任务列表弹窗
+                  const taskListModal = document.createElement('div');
+                  taskListModal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex-col items-center justify-center p-6';
+                  taskListModal.innerHTML = `
+
+
+
+
+
+
+      <div class="bg-white rounded-2xl w-full max-w-md max-h-[80vh] overflow-y-auto">
+        <div class="p-5 border-b flex justify-between items-center">
+          <h2 class="text-xl font-bold text-gray-800">所有任务</h2>
+            <button id="close-task-modal" class="text-gray-500 hover:text-gray-800">
+              <i class="fas fa-times text-lg">
+              </i>
+            </button>
+          </div>
+          <div class="p-5">
+            <div class="mb-4 pb-4 border-b">
+              <div class="flex items-start">
+                <div class="bg-red-100 p-2 rounded-full mr-3 mt-1">
+                  <i class="fas fa-exclamation-circle text-red-500">
+                  </i>
+                </div>
+                <div>
+                  <div class="font-medium text-gray-800">下午2点开会</div>
+                    <div class="text-sm text-gray-500">今天 14:00 · 还剩2小时</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="mb-4 pb-4 border-b">
+                  <div class="flex items-start">
+                    <div class="bg-yellow-100 p-2 rounded-full mr-3 mt-1">
+                      <i class="fas fa-clock text-yellow-500">
+                      </i>
+                    </div>
+                    <div>
+                      <div class="font-medium text-gray-800">完成项目提案</div>
+                        <div class="text-sm text-gray-500">今天 18:00 · 还剩6小时</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="mb-4 pb-4 border-b">
+                      <div class="flex items-start">
+                        <div class="bg-green-100 p-2 rounded-full mr-3 mt-1">
+                          <i class="fas fa-check text-green-500">
+                          </i>
+                        </div>
+                        <div>
+                          <div class="font-medium text-gray-800 line-through">回复客户邮件</div>
+                            <div class="text-sm text-gray-400">今天 10:30 · 已完成</div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="mb-4 pb-4 border-b">
+                          <div class="flex items-start">
+                            <div class="bg-blue-100 p-2 rounded-full mr-3 mt-1">
+                              <i class="fas fa-calendar text-blue-500">
+                              </i>
+                            </div>
+                            <div>
+                              <div class="font-medium text-gray-800">准备明天会议材料</div>
+                                <div class="text-sm text-gray-500">明天 09:00 · 还剩17小时</div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="p-5 border-t">
+                            <button class="w-full py-3 bg-gradient-primary text-white rounded-xl font-medium shadow-button">
+                              <i class="fas fa-plus mr-2">
+                              </i> 添加新任务
+                            </button>
+                          </div>
+                        </div>
+
+
+
+
+
+
+                      `;
+                  document.body.appendChild(taskListModal);
+
+                  const closeTaskModal = taskListModal.querySelector('#close-task-modal');
+
+                  // 打开任务列表
+                  taskListButton.addEventListener('click', () => {
+                      taskListModal.classList.remove('hidden');
+                      taskListModal.classList.add('flex');
+                      document.body.style.overflow = 'hidden'; // 防止背景滚动
+                  });
+
+                  // 关闭任务列表
+                  closeTaskModal.addEventListener('click', () => {
+                      taskListModal.classList.add('hidden');
+                      taskListModal.classList.remove('flex');
+                      document.body.style.overflow = ''; // 恢复背景滚动
+                  });
+
+                  // 点击背景关闭
+                  taskListModal.addEventListener('click', (e) => {
+                      if (e.target === taskListModal) {
+                          taskListModal.classList.add('hidden');
+                          taskListModal.classList.remove('flex');
+                          document.body.style.overflow = '';
+                      }
+                  });
+              });
+    </script>
+    <!-- [/JSMOD] k3o_任务列表功能 -- 实现任务列表弹窗的显示、隐藏和任务展示功能，包括查看所有任务、关闭弹窗和添加新任务按钮 -->
+  </body>
+</html>

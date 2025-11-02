@@ -1,0 +1,1606 @@
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>TaskAI - 任务列表</title>
+    <script src="https://res.gemcoder.com/js/reload.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+                  theme: {
+                      extend: {
+                          colors: {
+                              primary: '#667eea',
+                              secondary: '#764ba2',
+                              task: '#fff3cd',
+                              completed: '#f3f4f6',
+                              highPriority: '#ef4444',
+                              mediumPriority: '#f59e0b',
+                              lowPriority: '#10b981'
+                          },
+                          spacing: {
+                              '5.5': '1.375rem',
+                          }
+                      }
+                  }
+              };
+    </script>
+    <style type="text/tailwindcss">
+      @layer utilities {
+          .content-auto {
+              content-visibility: auto;
+          }
+          .bg-gradient-primary {
+              background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          }
+          .text-shadow {
+              text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          }
+          .task-card {
+              @apply bg-white rounded-xl p-4 shadow-sm border border-gray-100 transition-all duration-200 hover:shadow-md;
+          }
+          .task-completed {
+              @apply bg-completed text-gray-400 line-through;
+          }
+          .task-high {
+              @apply border-l-4 border-highPriority;
+          }
+          .task-medium {
+              @apply border-l-4 border-mediumPriority;
+          }
+          .task-low {
+              @apply border-l-4 border-lowPriority;
+          }
+          .recording-button {
+              @apply w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-primary flex items-center justify-center shadow-lg transition-transform duration-200 active:scale-95;
+          }
+          .filter-active {
+              @apply bg-primary text-white;
+          }
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 min-h-screen flex flex-col">
+    <!-- [MODULE] abc_主内容区域 -->
+    <div class="flex flex-col h-screen">
+      <!-- [MODULE] d23_顶部导航栏 -->
+      <header
+        class="h-16 flex items-center justify-between px-6 bg-white shadow-sm"
+      >
+        <!-- [MODULE] 56h_顶部导航栏:返回按钮 -->
+        <div>
+          <button
+            class="text-gray-500 hover:text-gray-800 transition-colors"
+            id="back-button"
+          >
+            <i class="fas fa-arrow-left text-lg"> </i>
+          </button>
+        </div>
+        <!-- [/MODULE] 56h_顶部导航栏:返回按钮 -- 点击返回上一页 -->
+        <!-- [MODULE] 33f_顶部导航栏:页面标题 -->
+        <div class="flex items-center">
+          <span class="text-xl font-bold mr-2"> 📝 </span>
+          <span class="text-xl font-bold text-gray-800"> 任务列表 </span>
+        </div>
+        <!-- [/MODULE] 33f_顶部导航栏:页面标题 -- 显示页面图标、标题和任务总数 -->
+        <!-- [MODULE] 45g_顶部导航栏:设置按钮 -->
+        <div>
+          <button
+            class="text-gray-500 hover:text-gray-800 transition-colors"
+            id="settings-btn"
+          >
+            <i class="fas fa-cog text-lg"> </i>
+          </button>
+        </div>
+        <!-- [/MODULE] 45g_顶部导航栏:设置按钮 -->
+      </header>
+      <!-- [/MODULE] d23_顶部导航栏 -- 包含返回按钮、页面标题和搜索按钮 -->
+      <!-- [MODULE] e7h_搜索筛选区域 -->
+      <div class="bg-white px-6 py-4 shadow-sm">
+        <!-- [MODULE] f8j_搜索筛选区域:搜索框 -->
+        <div class="relative mb-4">
+          <input
+            class="w-full py-3 px-4 pl-10 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+            id="search-input"
+            placeholder="🔍 搜索任务..."
+            type="text"
+          />
+        </div>
+        <!-- [/MODULE] f8j_搜索筛选区域:搜索框 -- 用于搜索任务内容 -->
+        <!-- [MODULE] g9k_搜索筛选区域:筛选标签 -->
+        <div class="flex overflow-x-auto pb-2 space-x-2 hide-scrollbar">
+          <button
+            class="filter-active whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-colors"
+            data-filter="all"
+          >
+            全部
+          </button>
+          <button
+            class="whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-700 transition-colors"
+            data-filter="today"
+          >
+            今天
+          </button>
+          <button
+            class="whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-700 transition-colors"
+            data-filter="tomorrow"
+          >
+            明天
+          </button>
+          <button
+            class="whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-700 transition-colors"
+            data-filter="week"
+          >
+            本周
+          </button>
+          <button
+            class="whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-700 transition-colors"
+            data-filter="completed"
+          >
+            已完成
+          </button>
+        </div>
+        <!-- [/MODULE] g9k_搜索筛选区域:筛选标签 -- 提供任务分类筛选功能，包括全部、今天、明天、本周和已完成 -->
+      </div>
+      <!-- [/MODULE] e7h_搜索筛选区域 -- 包含搜索框和筛选标签，用于任务查找和分类 -->
+      <!-- [MODULE] h0l_任务列表区域 -->
+      <main class="flex-grow overflow-y-auto bg-gray-50 px-4 py-6 h-[704px]">
+        <!-- [MODULE] z2x_批量操作工具栏 -->
+        <div
+          class="hidden bg-white rounded-xl p-3 mb-4 shadow-sm flex items-center justify-between"
+          id="batch-toolbar"
+        >
+          <div class="flex items-center">
+            <i class="fas fa-check-square text-primary mr-2"> </i>
+            <span id="selected-count"> 已选择 0 个任务 </span>
+          </div>
+          <div class="flex space-x-3">
+            <button
+              class="px-3 py-1 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
+              id="toolbar-complete"
+            >
+              <i class="fas fa-check mr-1"> </i>
+              完成
+            </button>
+            <button
+              class="px-3 py-1 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+              id="toolbar-delete"
+            >
+              <i class="fas fa-trash mr-1"> </i>
+              删除
+            </button>
+            <button
+              class="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+              id="toolbar-cancel"
+            >
+              <i class="fas fa-times mr-1"> </i>
+              取消
+            </button>
+          </div>
+        </div>
+        <!-- [/MODULE] z2x_批量操作工具栏 -- 批量选择模式下显示的顶部操作栏，包含已选择任务数量和操作按钮 -->
+        <main class="flex-grow overflow-y-auto bg-gray-50 px-4 py-6">
+          <!-- [MODULE] i1m_任务列表区域:今天任务组 -->
+          <div class="mb-8">
+            <div class="flex items-center mb-4">
+              <span class="text-gray-500 mr-2"> 📅 </span>
+              <h2 class="text-lg font-semibold text-gray-800">
+                今天 (3个任务组 + 2个独立任务)
+              </h2>
+            </div>
+            <!-- [MODULE] j2n_任务列表区域:今天任务组:会议准备组 -->
+            <div class="task-card bg-blue-50 rounded-2xl mb-4 overflow-hidden">
+              <div
+                class="task-group-header flex justify-between items-center p-4 cursor-pointer group-toggle"
+                data-group-id="meeting-prep"
+              >
+                <div class="font-medium text-gray-800 flex items-center">
+                  <i class="fas fa-list-check mr-2"> </i>
+                  会议准备
+                </div>
+                <div class="relative group">
+                  <button
+                    class="text-gray-500 hover:text-gray-800 transition-colors group-expand-btn flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100"
+                  >
+                    <i class="fas fa-ellipsis-v"> </i>
+                  </button>
+                  <!-- [MODULE] a1b_任务列表区域:任务组操作菜单 -->
+                  <div
+                    class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-10 hidden group-menu"
+                  >
+                    <button
+                      class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 group-action-btn"
+                      data-action="edit"
+                    >
+                      编辑组名
+                    </button>
+                    <button
+                      class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 group-action-btn"
+                      data-action="add-task"
+                    >
+                      添加子任务
+                    </button>
+                    <button
+                      class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 group-action-btn"
+                      data-action="stats"
+                    >
+                      查看统计
+                    </button>
+                    <button
+                      class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 group-action-btn"
+                      data-action="delete"
+                    >
+                      删除任务组
+                    </button>
+                  </div>
+                  <!-- [/MODULE] a1b_任务列表区域:任务组操作菜单 -- 包含编辑组名、添加子任务、查看统计和删除任务组功能 -->
+                </div>
+              </div>
+              <div class="task-group-items pl-6 bg-blue-50/50 group-items">
+                <!-- 子任务1 -->
+                <div class="flex items-start py-2 border-b border-blue-100">
+                  <div class="mr-3 mt-1">
+                    <input
+                      checked
+                      class="task-checkbox w-5 h-5 rounded-full border-gray-300 text-green-500 focus:ring-green-500"
+                      type="checkbox"
+                    />
+                  </div>
+                  <div class="flex-grow">
+                    <div
+                      class="font-medium text-gray-800 line-through text-gray-500"
+                    >
+                      预定会议室
+                    </div>
+                    <div class="text-sm text-gray-500 mt-1">
+                      <span
+                        class="bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded mr-2"
+                      >
+                        15min
+                      </span>
+                      <i class="far fa-clock mr-1"> </i>
+                      14:00
+                      <i class="fas fa-map-marker-alt ml-3 mr-1"> </i>
+                      3楼会议室
+                    </div>
+                    <div class="flex justify-end mt-1">
+                      <button
+                        class="edit-btn text-blue-600 hover:text-blue-800 text-sm mr-3"
+                      >
+                        编辑
+                      </button>
+                      <button
+                        class="delete-btn text-red-600 hover:text-red-800 text-sm"
+                      >
+                        删除
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <!-- 子任务2 -->
+                <div class="flex items-start py-2 border-b border-blue-100">
+                  <div class="mr-3 mt-1">
+                    <input
+                      class="task-checkbox w-5 h-5 rounded-full border-gray-300 text-green-500 focus:ring-green-500"
+                      type="checkbox"
+                    />
+                  </div>
+                  <div class="flex-grow">
+                    <div class="font-medium text-gray-800">准备PPT</div>
+                    <div class="text-sm text-gray-500 mt-1">
+                      <span
+                        class="bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded mr-2"
+                      >
+                        30min
+                      </span>
+                      <i class="far fa-clock mr-1"> </i>
+                      16:00
+                      <i class="fas fa-map-marker-alt ml-3 mr-1"> </i>
+                      本地桌面
+                    </div>
+                    <div class="flex justify-end mt-1">
+                      <button
+                        class="edit-btn text-blue-600 hover:text-blue-800 text-sm mr-3"
+                      >
+                        编辑
+                      </button>
+                      <button
+                        class="delete-btn text-red-600 hover:text-red-800 text-sm"
+                      >
+                        删除
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <!-- 子任务3 -->
+                <div class="flex items-start py-2">
+                  <div class="mr-3 mt-1">
+                    <input
+                      class="task-checkbox w-5 h-5 rounded-full border-gray-300 text-green-500 focus:ring-green-500"
+                      type="checkbox"
+                    />
+                  </div>
+                  <div class="flex-grow">
+                    <div class="font-medium text-gray-800">联系参会人员</div>
+                    <div class="text-sm text-gray-500 mt-1">
+                      <span
+                        class="bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded mr-2"
+                      >
+                        20min
+                      </span>
+                      <i class="far fa-clock mr-1"> </i>
+                      17:00
+                      <span class="ml-3"> 无地点 </span>
+                    </div>
+                    <div class="flex justify-end mt-1">
+                      <button
+                        class="edit-btn text-blue-600 hover:text-blue-800 text-sm mr-3"
+                      >
+                        编辑
+                      </button>
+                      <button
+                        class="delete-btn text-red-600 hover:text-red-800 text-sm"
+                      >
+                        删除
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <!-- 组进度 -->
+                <div class="p-3 bg-blue-50/30 mt-2">
+                  <div class="flex justify-between text-sm">
+                    <span class="text-gray-600"> 📊 组进度：1/3 完成 </span>
+                    <div class="w-24 bg-gray-200 rounded-full h-2">
+                      <div
+                        class="bg-green-500 h-2 rounded-full"
+                        style="width: 33%"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- [/MODULE] j2n_任务列表区域:今天任务组:会议准备组 -->
+            <!-- [MODULE] k3o_任务列表区域:今天任务组:生活采购组 -->
+            <div class="task-card bg-blue-50 rounded-2xl mb-4 overflow-hidden">
+              <div
+                class="task-group-header flex justify-between items-center p-4 cursor-pointer group-toggle"
+                data-group-id="shopping"
+              >
+                <div class="font-medium text-gray-800 flex items-center">
+                  <i class="fas fa-shopping-basket mr-2"> </i>
+                  生活采购
+                </div>
+                <button
+                  class="text-gray-500 hover:text-gray-800 transition-colors group-expand-btn"
+                >
+                  <i class="fas fa-ellipsis-v"> </i>
+                </button>
+              </div>
+              <div class="task-group-items pl-6 bg-blue-50/50 group-items">
+                <!-- 子任务 -->
+                <div class="flex items-start py-2">
+                  <div class="mr-3 mt-1">
+                    <input
+                      class="task-checkbox w-5 h-5 rounded-full border-gray-300 text-green-500 focus:ring-green-500"
+                      type="checkbox"
+                    />
+                  </div>
+                  <div class="flex-grow">
+                    <div class="font-medium text-gray-800">买菜做晚饭</div>
+                    <div class="text-sm text-gray-500 mt-1">
+                      <span
+                        class="bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded mr-2"
+                      >
+                        45min
+                      </span>
+                      <i class="far fa-clock mr-1"> </i>
+                      18:30
+                      <i class="fas fa-map-marker-alt ml-3 mr-1"> </i>
+                      超市
+                    </div>
+                    <div class="flex justify-end mt-1">
+                      <button
+                        class="edit-btn text-blue-600 hover:text-blue-800 text-sm mr-3"
+                      >
+                        编辑
+                      </button>
+                      <button
+                        class="delete-btn text-red-600 hover:text-red-800 text-sm"
+                      >
+                        删除
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <!-- 组进度 -->
+                <div class="p-3 bg-blue-50/30 mt-2">
+                  <div class="flex justify-between text-sm">
+                    <span class="text-gray-600"> 📊 组进度：0/1 完成 </span>
+                    <div class="w-24 bg-gray-200 rounded-full h-2">
+                      <div
+                        class="bg-green-500 h-2 rounded-full"
+                        style="width: 0%"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- [/MODULE] k3o_任务列表区域:今天任务组:生活采购组 -->
+            <!-- [MODULE] l4p_任务列表区域:今天任务组:独立任务 -->
+            <div class="task-card bg-white rounded-2xl mb-4 overflow-hidden">
+              <div class="flex items-start p-4">
+                <div class="mr-3 mt-1">
+                  <input
+                    class="task-checkbox w-5 h-5 rounded-full border-gray-300 text-green-500 focus:ring-green-500"
+                    type="checkbox"
+                  />
+                </div>
+                <div class="flex-grow">
+                  <div class="font-medium text-gray-800">
+                    独立任务：健身锻炼
+                  </div>
+                  <div class="text-sm text-gray-500 mt-1">
+                    <i class="far fa-clock mr-1"> </i>
+                    19:00
+                    <i class="fas fa-map-marker-alt ml-3 mr-1"> </i>
+                    健身房
+                  </div>
+                  <div class="flex justify-end mt-1">
+                    <button
+                      class="edit-btn text-blue-600 hover:text-blue-800 text-sm mr-3"
+                    >
+                      编辑
+                    </button>
+                    <button
+                      class="delete-btn text-red-600 hover:text-red-800 text-sm"
+                    >
+                      删除
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- [/MODULE] l4p_任务列表区域:今天任务组:独立任务 -->
+          </div>
+          <!-- [/MODULE] i1m_任务列表区域:今天任务组 -->
+          <!-- [MODULE] m5q_任务列表区域:明天任务组 -->
+          <div class="mb-8">
+            <div class="flex items-center mb-4">
+              <span class="text-gray-500 mr-2"> 📅 </span>
+              <h2 class="text-lg font-semibold text-gray-800">
+                明天 (2个任务组)
+              </h2>
+            </div>
+            <!-- [MODULE] n6r_任务列表区域:明天任务组:周报准备组 -->
+            <div class="task-card bg-blue-50 rounded-2xl mb-4 overflow-hidden">
+              <div
+                class="task-group-header flex justify-between items-center p-4 cursor-pointer group-toggle"
+                data-group-id="weekly-report"
+              >
+                <div class="font-medium text-gray-800 flex items-center">
+                  <i class="fas fa-file-alt mr-2"> </i>
+                  周报准备
+                </div>
+                <button
+                  class="text-gray-500 hover:text-gray-800 transition-colors group-expand-btn"
+                >
+                  <i class="fas fa-ellipsis-v"> </i>
+                </button>
+              </div>
+              <div class="task-group-items pl-6 bg-blue-50/50 group-items">
+                <!-- 子任务1 -->
+                <div class="flex items-start py-2 border-b border-blue-100">
+                  <div class="mr-3 mt-1">
+                    <input
+                      class="task-checkbox w-5 h-5 rounded-full border-gray-300 text-green-500 focus:ring-green-500"
+                      type="checkbox"
+                    />
+                  </div>
+                  <div class="flex-grow">
+                    <div class="font-medium text-gray-800">整理本周工作</div>
+                    <div class="text-sm text-gray-500 mt-1">
+                      <span
+                        class="bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded"
+                      >
+                        60min
+                      </span>
+                    </div>
+                    <div class="flex justify-end mt-1">
+                      <button
+                        class="edit-btn text-blue-600 hover:text-blue-800 text-sm mr-3"
+                      >
+                        编辑
+                      </button>
+                      <button
+                        class="delete-btn text-red-600 hover:text-red-800 text-sm"
+                      >
+                        删除
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <!-- 子任务2 -->
+                <div class="flex items-start py-2">
+                  <div class="mr-3 mt-1">
+                    <input
+                      class="task-checkbox w-5 h-5 rounded-full border-gray-300 text-green-500 focus:ring-green-500"
+                      type="checkbox"
+                    />
+                  </div>
+                  <div class="flex-grow">
+                    <div class="font-medium text-gray-800">制作周报PPT</div>
+                    <div class="text-sm text-gray-500 mt-1">
+                      <span
+                        class="bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded"
+                      >
+                        90min
+                      </span>
+                    </div>
+                    <div class="flex justify-end mt-1">
+                      <button
+                        class="edit-btn text-blue-600 hover:text-blue-800 text-sm mr-3"
+                      >
+                        编辑
+                      </button>
+                      <button
+                        class="delete-btn text-red-600 hover:text-red-800 text-sm"
+                      >
+                        删除
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <!-- 组进度 -->
+                <div class="p-3 bg-blue-50/30 mt-2">
+                  <div class="flex justify-between text-sm">
+                    <span class="text-gray-600"> 📊 组进度：0/2 完成 </span>
+                    <div class="w-24 bg-gray-200 rounded-full h-2">
+                      <div
+                        class="bg-green-500 h-2 rounded-full"
+                        style="width: 0%"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- [/MODULE] n6r_任务列表区域:明天任务组:周报准备组 -->
+          </div>
+          <!-- [/MODULE] m5q_任务列表区域:明天任务组 -->
+        </main>
+        <!-- [/MODULE] h0l_任务列表区域 -- 按日期分组显示所有任务，包含今天、明天和本周三个任务组 -->
+      </main>
+    </div>
+    <!-- [/MODULE] abc_主内容区域 -- TaskAI任务列表页面，提供完整的任务管理功能 -->
+    <!-- [JSMOD] k9d_批量选择功能 -->
+    <script id="batch-selection-script">
+      document.addEventListener('DOMContentLoaded', () => {
+            const batchToolbar = document.getElementById('batch-toolbar');
+            const selectedCount = document.getElementById('selected-count');
+            const toolbarComplete = document.getElementById('toolbar-complete');
+            const toolbarDelete = document.getElementById('toolbar-delete');
+            const toolbarCancel = document.getElementById('toolbar-cancel');
+            const taskCards = document.querySelectorAll('.task-card');
+
+            let selectedTasks = [];
+            let longPressTimer = null;
+            let isBatchMode = false;
+
+            // 初始化任务卡片事件监听
+            function initTaskEvents() {
+              document.querySelectorAll('.task-card').forEach(card => {
+                // 长按事件
+                card.addEventListener('mousedown', startLongPress);
+                card.addEventListener('touchstart', startLongPress, { passive: true });
+
+                // 取消长按
+                card.addEventListener('mouseup', cancelLongPress);
+                card.addEventListener('mouseleave', cancelLongPress);
+                card.addEventListener('touchend', cancelLongPress);
+                card.addEventListener('touchcancel', cancelLongPress);
+
+                // 点击选择
+                card.addEventListener('click', (e) => {
+                  if (isBatchMode && !e.target.closest('button')) {
+                    toggleTaskSelection(card);
+                  }
+                });
+              });
+            }
+
+            // 开始长按计时
+            function startLongPress(e) {
+              if (!isBatchMode && !e.target.closest('button')) {
+                const card = e.currentTarget;
+                longPressTimer = setTimeout(() => {
+                  enterBatchMode();
+                  toggleTaskSelection(card);
+                }, 500);
+              }
+            }
+
+            // 取消长按计时
+            function cancelLongPress() {
+              clearTimeout(longPressTimer);
+            }
+
+            // 进入批量选择模式
+            function enterBatchMode() {
+              isBatchMode = true;
+              batchToolbar.classList.remove('hidden');
+              document.querySelectorAll('.task-card').forEach(card => {
+                card.classList.add('cursor-pointer');
+                card.style.transition = 'transform 0.2s';
+              });
+            }
+
+            // 退出批量选择模式
+            function exitBatchMode() {
+              isBatchMode = false;
+              batchToolbar.classList.add('hidden');
+              selectedTasks = [];
+              updateSelectedCount();
+              document.querySelectorAll('.task-card').forEach(card => {
+                card.classList.remove('cursor-pointer', 'ring-2', 'ring-primary', 'scale-102');
+                card.removeAttribute('data-selected');
+              });
+            }
+
+            // 切换任务选择状态
+            function toggleTaskSelection(card) {
+              const taskId = card.dataset.taskId;
+              const index = selectedTasks.indexOf(taskId);
+
+              if (index > -1) {
+                // 取消选择
+                selectedTasks.splice(index, 1);
+                card.classList.remove('ring-2', 'ring-primary', 'scale-102');
+                card.removeAttribute('data-selected');
+              } else {
+                // 选择任务
+                selectedTasks.push(taskId);
+                card.classList.add('ring-2', 'ring-primary', 'scale-102');
+                card.setAttribute('data-selected', 'true');
+              }
+
+              updateSelectedCount();
+            }
+
+            // 更新选择数量显示
+            function updateSelectedCount() {
+              selectedCount.textContent = `已选择 ${selectedTasks.length} 个任务`;
+            }
+
+            // 批量完成任务
+            toolbarComplete.addEventListener('click', () => {
+              if (selectedTasks.length > 0) {
+                // 这里添加批量完成逻辑
+                alert(`已完成 ${selectedTasks.length} 个任务`);
+                exitBatchMode();
+              }
+            });
+
+            // 批量删除任务
+            toolbarDelete.addEventListener('click', () => {
+              if (selectedTasks.length > 0) {
+                // 添加批量删除逻辑
+                alert(`已删除 ${selectedTasks.length} 个任务`);
+                exitBatchMode();
+              }
+            });
+
+            // 取消批量选择
+            toolbarCancel.addEventListener('click', exitBatchMode);
+
+            // 初始化事件监听
+            initTaskEvents();
+          });
+    </script>
+    <!-- [/JSMOD] k9d_批量选择功能 -- 实现长按任务进入批量选择模式，顶部显示操作工具栏 -->
+    <!-- [JSMOD] 1a2_任务组展开收起功能 -->
+    <script id="task-group-toggle">
+      document.addEventListener('DOMContentLoaded', () => {
+            // 任务组展开/收起功能
+            const groupToggles = document.querySelectorAll('.group-toggle');
+            groupToggles.forEach(toggle => {
+              toggle.addEventListener('click', () => {
+                const groupId = toggle.getAttribute('data-group-id');
+                const groupItems = toggle.nextElementSibling;
+
+                // 切换显示状态
+                if (groupItems.style.display === 'none') {
+                  groupItems.style.display = 'block';
+                } else {
+                  groupItems.style.display = 'none';
+                }
+              });
+            });
+          });
+    </script>
+    <!-- [/JSMOD] 1a2_任务组展开收起功能 -- 点击任务组标题展开或收起子任务列表 -->
+    <!-- [JSMOD] 3c4_任务复选框状态切换功能 -->
+    <script id="task-checkbox-toggle">
+      document.addEventListener('DOMContentLoaded', () => {
+            // 任务复选框状态切换
+            const taskCheckboxes = document.querySelectorAll('.task-checkbox');
+            taskCheckboxes.forEach(checkbox => {
+              checkbox.addEventListener('change', () => {
+                const taskText = checkbox.nextElementSibling.querySelector('.font-medium');
+
+                if (checkbox.checked) {
+                  taskText.classList.add('line-through', 'text-gray-500');
+                } else {
+                  taskText.classList.remove('line-through', 'text-gray-500');
+                }
+
+                // 更新任务组进度
+                updateGroupProgress(checkbox.closest('.task-group-items'));
+              });
+            });
+
+            // 更新任务组进度
+            function updateGroupProgress(groupItems) {
+              if (!groupItems) return;
+
+              const groupCard = groupItems.closest('.task-card');
+              const checkboxes = groupItems.querySelectorAll('.task-checkbox');
+              const total = checkboxes.length;
+              const completed = Array.from(checkboxes).filter(cb => cb.checked).length;
+              const progressPercent = Math.round((completed / total) * 100);
+
+              // 更新进度文本和进度条
+              const progressText = groupCard.querySelector('.text-gray-600');
+              const progressBar = groupCard.querySelector('.bg-green-500');
+
+              if (progressText && progressBar) {
+                progressText.textContent = `📊 组进度：${completed}/${total} 完成`;
+                progressBar.style.width = `${progressPercent}%`;
+              }
+            }
+          });
+    </script>
+    <!-- [/JSMOD] 3c4_任务复选框状态切换功能 -- 切换任务完成状态并更新任务组进度 -->
+    <!-- [JSMOD] a7b_批量选择模式功能 -->
+    <script id="batch-selection">
+      document.addEventListener('DOMContentLoaded', () => {
+            let batchMode = false;
+            const taskItems = document.querySelectorAll('.task-card, .flex.items-start.py-2');
+            const header = document.querySelector('header');
+            let selectedCount = 0;
+
+            // 创建批量操作栏
+            const batchActionBar = document.createElement('div');
+            batchActionBar.className = 'fixed top-0 left-0 right-0 bg-white shadow-md p-4 z-50 hidden';
+            batchActionBar.innerHTML = `
+
+
+
+
+
+
+
+      <div class="flex justify-between items-center">
+        <div>已选择 <span id="selected-count">0</span> 个任务</div>
+          <div>
+            <button id="batch-complete" class="bg-green-500 text-white px-3 py-1 rounded mr-2">标记完成</button>
+              <button id="batch-delete" class="bg-red-500 text-white px-3 py-1 rounded mr-2">删除</button>
+                <button id="batch-cancel" class="bg-gray-200 text-gray-800 px-3 py-1 rounded">取消</button>
+                </div>
+              </div>
+
+
+
+
+
+
+
+            `;
+            document.body.prepend(batchActionBar);
+
+            // 长按任务项进入批量选择模式
+            taskItems.forEach(item => {
+              let pressTimer = null;
+
+              item.addEventListener('mousedown', (e) => {
+                if (e.target.closest('button, input')) return;
+
+                pressTimer = setTimeout(() => {
+                  enterBatchMode();
+                  toggleTaskSelection(item);
+                }, 500);
+              });
+
+              item.addEventListener('mouseup', () => {
+                clearTimeout(pressTimer);
+              });
+
+              item.addEventListener('mouseleave', () => {
+                clearTimeout(pressTimer);
+              });
+
+              // 批量模式下点击选择任务
+              item.addEventListener('click', (e) => {
+                if (batchMode && !e.target.closest('button, input')) {
+                  e.stopPropagation();
+                  toggleTaskSelection(item);
+                }
+              });
+            });
+
+            // 进入批量选择模式
+            function enterBatchMode() {
+              if (batchMode) return;
+
+              batchMode = true;
+              batchActionBar.classList.remove('hidden');
+              header.classList.add('hidden');
+
+              // 全选所有任务
+              document.getElementById('batch-complete').addEventListener('click', () => {
+                if (confirm(`确定要标记 ${selectedCount} 个任务为完成吗？`)) {
+                  // 标记完成逻辑...
+                  exitBatchMode();
+                }
+              });
+
+              // 批量删除
+              document.getElementById('batch-delete').addEventListener('click', () => {
+                if (confirm(`确定要删除 ${selectedCount} 个任务吗？`)) {
+                  // 删除逻辑...
+                  exitBatchMode();
+                }
+              });
+
+              // 取消批量选择
+              document.getElementById('batch-cancel').addEventListener('click', exitBatchMode);
+            }
+
+            // 退出批量选择模式
+            function exitBatchMode() {
+              batchMode = false;
+              batchActionBar.classList.add('hidden');
+              header.classList.remove('hidden');
+              selectedCount = 0;
+
+              // 清除所有选中状态
+              document.querySelectorAll('.task-card, .flex.items-start.py-2').forEach(item => {
+                item.classList.remove('bg-blue-100');
+              });
+
+              document.getElementById('selected-count').textContent = '0';
+            }
+
+            // 切换任务选择状态
+            function toggleTaskSelection(item) {
+              item.classList.toggle('bg-blue-100');
+
+              if (item.classList.contains('bg-blue-100')) {
+                selectedCount++;
+              } else {
+                selectedCount--;
+              }
+
+              document.getElementById('selected-count').textContent = selectedCount;
+            }
+          });
+    </script>
+    <!-- [/JSMOD] a7b_批量选择模式功能 -- 长按任务项进入批量选择模式，支持批量标记完成和删除 -->
+    <!-- [JSMOD] b0f_任务交互功能 -->
+    <script id="task-interaction-script">
+      document.addEventListener('DOMContentLoaded', () => {
+                  // 任务复选框交互
+                  const taskCheckboxes = document.querySelectorAll('.task-checkbox');
+                  taskCheckboxes.forEach(checkbox => {
+                      checkbox.addEventListener('change', function() {
+                          const taskCard = this.closest('.task-card');
+                          if (this.checked) {
+                              taskCard.classList.add('task-completed');
+                              taskCard.classList.remove('task-high', 'task-medium', 'task-low');
+                          } else {
+                              taskCard.classList.remove('task-completed');
+                              // 根据任务内容恢复优先级样式
+                              if (taskCard.querySelector('.font-medium').textContent.includes('项目评审会议')) {
+                                  taskCard.classList.add('task-high');
+                              } else if (taskCard.querySelector('.font-medium').textContent.includes('准备周报材料') ||
+                                        taskCard.querySelector('.font-medium').textContent.includes('更新项目进度') ||
+                                        taskCard.querySelector('.font-medium').textContent.includes('制定下周计划') ||
+                                        taskCard.querySelector('.font-medium').textContent.includes('团队技能培训')) {
+                                  taskCard.classList.add('task-medium');
+                              } else {
+                                  taskCard.classList.add('task-low');
+                              }
+                          }
+                      });
+                  });
+
+                  // 筛选标签交互
+                  const filterButtons = document.querySelectorAll('[data-filter]');
+                  filterButtons.forEach(button => {
+                      button.addEventListener('click', function() {
+                          // 移除所有按钮的active状态
+                          filterButtons.forEach(btn => btn.classList.remove('filter-active'));
+                          filterButtons.forEach(btn => btn.classList.add('bg-gray-100', 'text-gray-700'));
+
+                          // 添加当前按钮的active状态
+                          this.classList.add('filter-active');
+                          this.classList.remove('bg-gray-100', 'text-gray-700');
+
+                          // 根据筛选条件过滤任务
+                          const filter = this.getAttribute('data-filter');
+                          filterTasks(filter);
+                      });
+                  });
+
+                  // 任务过滤功能
+                  function filterTasks(filter) {
+                      const todayGroup = document.querySelector('h2:contains("今天")').closest('div');
+                      const tomorrowGroup = document.querySelector('h2:contains("明天")').closest('div');
+                      const weekGroup = document.querySelector('h2:contains("本周")').closest('div');
+
+                      switch(filter) {
+                          case 'all':
+                              todayGroup.style.display = 'block';
+                              tomorrowGroup.style.display = 'block';
+                              weekGroup.style.display = 'block';
+                              break;
+                          case 'today':
+                              todayGroup.style.display = 'block';
+                              tomorrowGroup.style.display = 'none';
+                              weekGroup.style.display = 'none';
+                              break;
+                          case 'tomorrow':
+                              todayGroup.style.display = 'none';
+                              tomorrowGroup.style.display = 'block';
+                              weekGroup.style.display = 'none';
+                              break;
+                          case 'week':
+                              todayGroup.style.display = 'none';
+                              tomorrowGroup.style.display = 'none';
+                              weekGroup.style.display = 'block';
+                              break;
+                          case 'completed':
+                              todayGroup.style.display = 'block';
+                              tomorrowGroup.style.display = 'block';
+                              weekGroup.style.display = 'block';
+
+                              // 隐藏未完成任务，显示已完成任务
+                              document.querySelectorAll('.task-card:not(.task-completed)').forEach(card => {
+                                  card.style.display = 'none';
+                              });
+                              document.querySelectorAll('.task-card.task-completed').forEach(card => {
+                                  card.style.display = 'block';
+                              });
+
+                              // 如果某个组没有可见任务，则隐藏该组
+                              if (todayGroup.querySelectorAll('.task-card.task-completed').length === 0) {
+                                  todayGroup.style.display = 'none';
+                              }
+                              if (tomorrowGroup.querySelectorAll('.task-card.task-completed').length === 0) {
+                                  tomorrowGroup.style.display = 'none';
+                              }
+                              if (weekGroup.querySelectorAll('.task-card.task-completed').length === 0) {
+                                  weekGroup.style.display = 'none';
+                              }
+                              break;
+                      }
+                  }
+
+                  // 搜索功能
+                  const searchInput = document.getElementById('search-input');
+                  searchInput.addEventListener('input', function() {
+                      const searchTerm = this.value.toLowerCase().trim();
+                      const taskCards = document.querySelectorAll('.task-card');
+
+                      taskCards.forEach(card => {
+                          const taskText = card.textContent.toLowerCase();
+                          if (taskText.includes(searchTerm)) {
+                              card.style.display = 'block';
+                              // 确保包含搜索结果的任务组可见
+                              card.closest('[class*="任务组"]').style.display = 'block';
+                          } else {
+                              card.style.display = 'none';
+                          }
+                      });
+
+                      // 检查每个任务组是否有可见任务，如果没有则隐藏该组
+                      const taskGroups = document.querySelectorAll('[class*="任务组"]');
+                      taskGroups.forEach(group => {
+                          const visibleTasks = group.querySelectorAll('.task-card:not([style*="display: none"])');
+                          if (visibleTasks.length === 0) {
+                              group.style.display = 'none';
+                          }
+                      });
+                  });
+
+                  // 返回按钮功能
+                  const backButton = document.getElementById('back-button');
+                  backButton.addEventListener('click', function() {
+                      // 在实际应用中这里会是返回上一页的逻辑
+                      window.history.back();
+                  });
+
+                  // 搜索按钮功能
+                  const searchButton = document.getElementById('search-button');
+                  searchButton.addEventListener('click', function() {
+                      searchInput.focus();
+                  });
+
+                  // 添加任务按钮功能 - 模拟添加任务
+                  const addTaskButton = document.getElementById('add-task-button');
+                  addTaskButton.addEventListener('click', function() {
+                      // 创建新任务弹窗
+                      const modal = document.createElement('div');
+                      modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-6';
+                      modal.innerHTML = `
+
+
+
+
+
+
+
+
+
+      <div class="bg-white rounded-2xl w-full max-w-md p-6 transform transition-all">
+        <div class="text-center mb-6">
+          <h2 class="text-xl font-bold text-gray-800">添加新任务</h2>
+          </div>
+          <div class="mb-4">
+            <input type="text" placeholder="任务名称" class="w-full py-3 px-4 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary" id="new-task-name">
+            </div>
+            <div class="mb-4">
+              <input type="text" placeholder="日期时间" class="w-full py-3 px-4 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary" id="new-task-time" value="今天 15:30">
+              </div>
+              <div class="mb-6">
+                <select class="w-full py-3 px-4 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary" id="new-task-priority">
+                  <option value="low">低优先级</option>
+                    <option value="medium" selected>中优先级</option>
+                      <option value="high">高优先级</option>
+                      </select>
+                    </div>
+                    <button class="w-full py-3 bg-gradient-primary text-white rounded-xl font-medium shadow-lg transition-transform duration-200 active:scale-95" id="confirm-add-task">
+                      添加任务
+                    </button>
+                    <button class="w-full py-3 mt-3 border border-gray-300 text-gray-700 rounded-xl font-medium transition-colors hover:bg-gray-50" id="cancel-add-task">
+                      取消
+                    </button>
+                  </div>
+
+
+
+
+
+
+
+
+
+                `;
+                      document.body.appendChild(modal);
+
+                      // 确认添加任务
+                      modal.querySelector('#confirm-add-task').addEventListener('click', function() {
+                          const taskName = modal.querySelector('#new-task-name').value;
+                          if (taskName.trim()) {
+                              // 这里会是实际添加任务的逻辑
+                              alert(`任务 "${taskName}" 添加成功！`);
+                              document.body.removeChild(modal);
+                          } else {
+                              alert('请输入任务名称');
+                          }
+                      });
+
+                      // 取消添加任务
+                      modal.querySelector('#cancel-add-task').addEventListener('click', function() {
+                          document.body.removeChild(modal);
+                      });
+
+                      // 点击模态框背景关闭
+                      modal.addEventListener('click', function(e) {
+                          if (e.target === modal) {
+                              document.body.removeChild(modal);
+                          }
+                      });
+                  });
+
+                  // 任务卡片滑动操作 - 模拟实现
+                  const taskCards = document.querySelectorAll('.task-card');
+                  taskCards.forEach(card => {
+                      let startX, moveX, isDragging = false;
+
+                      card.addEventListener('touchstart', function(e) {
+                          startX = e.touches[0].clientX;
+                          isDragging = true;
+                      });
+
+                      card.addEventListener('touchmove', function(e) {
+                          if (!isDragging) return;
+                          moveX = e.touches[0].clientX - startX;
+
+                          // 右滑显示完成操作
+                          if (moveX > 50) {
+                              this.style.transform = `translateX(${moveX}px)`;
+                              this.style.opacity = '0.8';
+                          }
+                          // 左滑显示编辑/删除操作
+                          else if (moveX < -50) {
+                              this.style.transform = `translateX(${moveX}px)`;
+                              this.style.opacity = '0.8';
+                          }
+                      });
+
+                      card.addEventListener('touchend', function() {
+                          isDragging = false;
+                          // 右滑超过阈值，标记为完成
+                          if (moveX > 80) {
+                              const checkbox = this.querySelector('.task-checkbox');
+                              if (!checkbox.checked) {
+                                  checkbox.checked = true;
+                                  checkbox.dispatchEvent(new Event('change'));
+                              }
+                          }
+                          // 左滑超过阈值，显示操作选项
+                          else if (moveX < -80) {
+                              alert('显示编辑/删除选项');
+                          }
+
+                          // 重置卡片位置
+                          this.style.transform = 'translateX(0)';
+                          this.style.opacity = '1';
+                      });
+                  });
+              });
+    </script>
+    <!-- [/JSMOD] b0f_任务交互功能 -- 实现任务复选框状态切换、筛选标签切换、搜索功能、任务添加、返回按钮和滑动操作等交互逻辑 -->
+    <!-- [JSMOD] b2c_任务组菜单交互 -->
+    <script id="taskGroupMenu">
+      document.addEventListener('DOMContentLoaded', () => {
+            // 点击任务组操作按钮显示/隐藏菜单
+            const groupActionButtons = document.querySelectorAll('.group-expand-btn');
+            groupActionButtons.forEach(button => {
+              button.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const menu = button.nextElementSibling;
+                if (menu && menu.classList.contains('group-menu')) {
+                  menu.classList.toggle('hidden');
+                }
+              });
+            });
+
+            // 点击页面其他地方隐藏所有菜单
+            document.addEventListener('click', () => {
+              const menus = document.querySelectorAll('.group-menu');
+              menus.forEach(menu => {
+                menu.classList.add('hidden');
+              });
+            });
+          });
+    </script>
+    <!-- [/JSMOD] b2c_任务组菜单交互 -- 控制任务组下拉菜单的显示和隐藏 -->
+  </body>
+  <!-- [MODULE] c3d_编辑组名弹窗 -->
+  <div
+    id="editGroupNameModal"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
+  >
+    <div class="bg-white rounded-xl p-6 w-5/6 max-w-sm">
+      <h3 class="text-lg font-semibold text-gray-800 mb-4">编辑组名</h3>
+      <input
+        type="text"
+        id="newGroupName"
+        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary mb-4"
+        placeholder="输入新的组名"
+      />
+      <div class="flex justify-end space-x-3">
+        <button
+          id="cancelEditGroupName"
+          class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+        >
+          取消
+        </button>
+        <button
+          id="confirmEditGroupName"
+          class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90"
+        >
+          保存
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- [/MODULE] c3d_编辑组名弹窗 -- 用于修改任务组名称的弹窗 -->
+  <!-- [JSMOD] d4e_编辑组名功能 -->
+  <script id="editGroupName">
+    document.addEventListener('DOMContentLoaded', () => {
+          let currentGroupId = null;
+          const modal = document.getElementById('editGroupNameModal');
+          const input = document.getElementById('newGroupName');
+          const cancelBtn = document.getElementById('cancelEditGroupName');
+          const confirmBtn = document.getElementById('confirmEditGroupName');
+
+          // 点击编辑组名按钮
+          document.querySelectorAll('.group-action-btn[data-action="edit"]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const groupHeader = btn.closest('.task-group-header');
+              currentGroupId = groupHeader.dataset.groupId;
+              const currentName = groupHeader.querySelector('.font-medium').textContent.trim();
+
+              input.value = currentName;
+              modal.classList.remove('hidden');
+
+              // 隐藏菜单
+              btn.closest('.group-menu').classList.add('hidden');
+            });
+          });
+
+          // 取消编辑
+          cancelBtn.addEventListener('click', () => {
+            modal.classList.add('hidden');
+            currentGroupId = null;
+          });
+
+          // 确认编辑
+          confirmBtn.addEventListener('click', () => {
+            if (currentGroupId && input.value.trim()) {
+              const groupHeader = document.querySelector(`.task-group-header[data-group-id="${currentGroupId}"]`);
+              if (groupHeader) {
+                groupHeader.querySelector('.font-medium').textContent = input.value.trim();
+              }
+            }
+            modal.classList.add('hidden');
+            currentGroupId = null;
+          });
+        });
+  </script>
+  <!-- [/JSMOD] d4e_编辑组名功能 -- 处理任务组名称的修改 -->
+  <!-- [MODULE] e5f_添加子任务弹窗 -->
+  <div
+    id="addSubtaskModal"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
+  >
+    <div class="bg-white rounded-xl p-6 w-5/6 max-w-sm">
+      <h3 class="text-lg font-semibold text-gray-800 mb-4">添加子任务</h3>
+      <input
+        type="text"
+        id="subtaskName"
+        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary mb-4"
+        placeholder="任务名称"
+      />
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <input
+          type="text"
+          id="subtaskTime"
+          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+          placeholder="耗时 (分钟)"
+        />
+        <input
+          type="text"
+          id="subtaskDeadline"
+          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+          placeholder="时间 (HH:MM)"
+        />
+      </div>
+      <input
+        type="text"
+        id="subtaskLocation"
+        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary mb-4"
+        placeholder="地点"
+      />
+      <div class="flex justify-end space-x-3">
+        <button
+          id="cancelAddSubtask"
+          class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+        >
+          取消
+        </button>
+        <button
+          id="confirmAddSubtask"
+          class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90"
+        >
+          添加
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- [/MODULE] e5f_添加子任务弹窗 -- 用于向任务组添加新的子任务 -->
+  <!-- [JSMOD] f6g_添加子任务功能 -->
+  <script id="addSubtask">
+    document.addEventListener('DOMContentLoaded', () => {
+          let currentGroupId = null;
+          const modal = document.getElementById('addSubtaskModal');
+          const nameInput = document.getElementById('subtaskName');
+          const timeInput = document.getElementById('subtaskTime');
+          const deadlineInput = document.getElementById('subtaskDeadline');
+          const locationInput = document.getElementById('subtaskLocation');
+          const cancelBtn = document.getElementById('cancelAddSubtask');
+          const confirmBtn = document.getElementById('confirmAddSubtask');
+
+          // 点击添加子任务按钮
+          document.querySelectorAll('.group-action-btn[data-action="add-task"]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const groupHeader = btn.closest('.task-group-header');
+              currentGroupId = groupHeader.dataset.groupId;
+
+              // 重置表单
+              nameInput.value = '';
+              timeInput.value = '';
+              deadlineInput.value = '';
+              locationInput.value = '';
+
+              modal.classList.remove('hidden');
+
+              // 隐藏菜单
+              btn.closest('.group-menu').classList.add('hidden');
+            });
+          });
+
+          // 取消添加
+          cancelBtn.addEventListener('click', () => {
+            modal.classList.add('hidden');
+            currentGroupId = null;
+          });
+
+          // 确认添加
+          confirmBtn.addEventListener('click', () => {
+            if (currentGroupId && nameInput.value.trim()) {
+              const groupItems = document.querySelector(`.task-group-header[data-group-id="${currentGroupId}"] + .group-items`);
+              if (groupItems) {
+                // 获取当前子任务数量
+                const taskCount = groupItems.querySelectorAll('.flex.items-start.py-2').length;
+                const isLastTask = taskCount === 0 || taskCount === groupItems.querySelectorAll('.border-b').length + 1;
+
+                // 创建新子任务HTML
+                const timeText = timeInput.value ? `${timeInput.value}min` : '';
+                const deadlineText = deadlineInput.value ? deadlineInput.value : '';
+                const locationText = locationInput.value ? locationInput.value : '';
+
+                const newTask = document.createElement('div');
+                newTask.className = `flex items-start py-2 ${isLastTask ? '' : 'border-b border-blue-100'}`;
+                newTask.innerHTML = `
+
+    <div class="mr-3 mt-1">
+      <input class="task-checkbox w-5 h-5 rounded-full border-gray-300 text-green-500 focus:ring-green-500" type="checkbox"/>
+    </div>
+    <div class="flex-grow">
+      <div class="font-medium text-gray-800">
+        ${nameInput.value.trim()}
+      </div>
+      <div class="text-sm text-gray-500 mt-1">
+        ${timeText ?
+      `<span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded mr-2">${timeText}</span>` : ''}
+                    ${deadlineText ? `<i class="far fa-clock mr-1"></i>${deadlineText}` : ''}
+                    ${locationText ? `<i class="fas fa-map-marker-alt ml-3 mr-1"></i>${locationText}` : ''}
+                   </div>
+                   <div class="flex justify-end mt-1">
+                    <button class="edit-btn text-blue-600 hover:text-blue-800 text-sm mr-3">编辑</button>
+                    <button class="delete-btn text-red-600 hover:text-red-800 text-sm">删除</button>
+                   </div>
+                  </div>
+                `;
+
+                // 插入到最后一个子任务前面（进度条前面）
+                const progressSection = groupItems.querySelector('.p-3.bg-blue-50/30');
+                groupItems.insertBefore(newTask, progressSection);
+
+                // 更新组进度
+                updateGroupProgress(currentGroupId);
+              }
+
+              modal.classList.add('hidden');
+              currentGroupId = null;
+            }
+            });
+        });
+
+        // 更新组进度
+        function updateGroupProgress(groupId) {
+          const groupHeader = document.querySelector(`.task-group-header[data-group-id="${groupId}"]`);
+          if (groupHeader) {
+            const groupItems = groupHeader.nextElementSibling;
+            const tasks = groupItems.querySelectorAll('.task-checkbox');
+            const completedTasks = groupItems.querySelectorAll('.task-checkbox:checked');
+            const progressBar = groupItems.querySelector('.bg-green-500');
+            const progressText = groupItems.querySelector('.text-gray-600');
+
+            if (tasks.length > 0 && progressBar && progressText) {
+              const percentage = Math.round((completedTasks.length / tasks.length) * 100);
+              progressBar.style.width = `${percentage}%`;
+              progressText.textContent = `📊 组进度：${completedTasks.length}/${tasks.length} 完成`;
+            }
+          }
+        }
+  </script>
+  <!-- [/JSMOD] f6g_添加子任务功能 -- 处理向任务组添加新子任务的逻辑 -->
+  <!-- [MODULE] g7h_删除任务组确认框 -->
+  <div
+    id="deleteGroupModal"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
+  >
+    <div class="bg-white rounded-xl p-6 w-5/6 max-w-sm">
+      <h3 class="text-lg font-semibold text-gray-800 mb-2">确认删除</h3>
+      <p class="text-gray-600 mb-6" id="deleteGroupMessage">
+        确定要删除这个任务组吗？
+      </p>
+      <div class="flex justify-end space-x-3">
+        <button
+          id="cancelDeleteGroup"
+          class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+        >
+          取消
+        </button>
+        <button
+          id="confirmDeleteGroup"
+          class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+        >
+          删除
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- [/MODULE] g7h_删除任务组确认框 -- 用于确认删除整个任务组 -->
+  <!-- [JSMOD] h8i_删除任务组功能 -->
+  <script id="deleteGroup">
+    document.addEventListener('DOMContentLoaded', () => {
+          let currentGroupId = null;
+          const modal = document.getElementById('deleteGroupModal');
+          const messageEl = document.getElementById('deleteGroupMessage');
+          const cancelBtn = document.getElementById('cancelDeleteGroup');
+          const confirmBtn = document.getElementById('confirmDeleteGroup');
+
+          // 点击删除任务组按钮
+          document.querySelectorAll('.group-action-btn[data-action="delete"]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const groupHeader = btn.closest('.task-group-header');
+              currentGroupId = groupHeader.dataset.groupId;
+              const groupName = groupHeader.querySelector('.font-medium').textContent.trim();
+              const groupItems = groupHeader.nextElementSibling;
+              const taskCount = groupItems.querySelectorAll('.task-checkbox').length;
+
+              // 更新确认消息
+              messageEl.textContent = `确定要删除"${groupName}"任务组吗？包含${taskCount}个子任务`;
+
+              modal.classList.remove('hidden');
+
+              // 隐藏菜单
+              btn.closest('.group-menu').classList.add('hidden');
+            });
+          });
+
+          // 取消删除
+          cancelBtn.addEventListener('click', () => {
+            modal.classList.add('hidden');
+            currentGroupId = null;
+          });
+
+          // 确认删除
+          confirmBtn.addEventListener('click', () => {
+            if (currentGroupId) {
+              const groupCard = document.querySelector(`.task-group-header[data-group-id="${currentGroupId}"]`).closest('.task-card');
+              if (groupCard) {
+                groupCard.remove();
+              }
+            }
+
+            modal.classList.add('hidden');
+            currentGroupId = null;
+          });
+        });
+  </script>
+  <!-- [/JSMOD] h8i_删除任务组功能 -- 处理删除整个任务组的逻辑 -->
+  <!-- [MODULE] i9j_查看统计弹窗 -->
+  <div
+    id="groupStatsModal"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
+  >
+    <div class="bg-white rounded-xl p-6 w-5/6 max-w-sm">
+      <h3 class="text-lg font-semibold text-gray-800 mb-4" id="statsGroupName">
+        任务组统计
+      </h3>
+      <div class="space-y-4">
+        <div class="flex justify-between items-center">
+          <span class="text-gray-600"> 总任务数 </span>
+          <span class="font-medium" id="statsTotalTasks"> 0 </span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-gray-600"> 已完成任务 </span>
+          <span class="font-medium text-green-600" id="statsCompletedTasks">
+            0
+          </span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-gray-600"> 待完成任务 </span>
+          <span class="font-medium text-yellow-600" id="statsPendingTasks">
+            0
+          </span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-gray-600"> 完成率 </span>
+          <span class="font-medium" id="statsCompletionRate"> 0% </span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-gray-600"> 预计总耗时 </span>
+          <span class="font-medium" id="statsTotalTime"> 0分钟 </span>
+        </div>
+      </div>
+      <div class="mt-6 flex justify-center">
+        <button
+          id="closeStatsModal"
+          class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90"
+        >
+          关闭
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- [/MODULE] i9j_查看统计弹窗 -- 显示任务组的详细统计信息 -->
+  <!-- [JSMOD] j0k_查看统计功能 -->
+  <script id="groupStats">
+    document.addEventListener('DOMContentLoaded', () => {
+          let currentGroupId = null;
+          const modal = document.getElementById('groupStatsModal');
+          const groupNameEl = document.getElementById('statsGroupName');
+          const totalTasksEl = document.getElementById('statsTotalTasks');
+          const completedTasksEl = document.getElementById('statsCompletedTasks');
+          const pendingTasksEl = document.getElementById('statsPendingTasks');
+          const completionRateEl = document.getElementById('statsCompletionRate');
+          const totalTimeEl = document.getElementById('statsTotalTime');
+          const closeBtn = document.getElementById('closeStatsModal');
+
+          // 点击查看统计按钮
+          document.querySelectorAll('.group-action-btn[data-action="stats"]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const groupHeader = btn.closest('.task-group-header');
+              currentGroupId = groupHeader.dataset.groupId;
+              const groupName = groupHeader.querySelector('.font-medium').textContent.trim();
+              const groupItems = groupHeader.nextElementSibling;
+
+              // 计算统计数据
+              const tasks = groupItems.querySelectorAll('.task-checkbox');
+              const completedTasks = groupItems.querySelectorAll('.task-checkbox:checked');
+              const totalTasks = tasks.length;
+              const completedCount = completedTasks.length;
+              const pendingCount = totalTasks - completedCount;
+              const completionRate = totalTasks > 0 ? Math.round((completedCount / totalTasks) * 100) : 0;
+
+              // 计算总时间
+              let totalMinutes = 0;
+              groupItems.querySelectorAll('.bg-yellow-100.text-yellow-800').forEach(el => {
+                const text = el.textContent.trim();
+                const minutes = parseInt(text);
+                if (!isNaN(minutes)) {
+                  totalMinutes += minutes;
+                }
+              });
+
+              // 更新统计显示
+              groupNameEl.textContent = `${groupName} 统计`;
+              totalTasksEl.textContent = totalTasks;
+              completedTasksEl.textContent = completedCount;
+              pendingTasksEl.textContent = pendingCount;
+              completionRateEl.textContent = `${completionRate}%`;
+              totalTimeEl.textContent = `${totalMinutes}分钟`;
+
+              modal.classList.remove('hidden');
+
+              // 隐藏菜单
+              btn.closest('.group-menu').classList.add('hidden');
+            });
+          });
+
+          // 关闭统计弹窗
+          closeBtn.addEventListener('click', () => {
+            modal.classList.add('hidden');
+            currentGroupId = null;
+          });
+        });
+  </script>
+  <!-- [/JSMOD] j0k_查看统计功能 -- 处理任务组统计信息的计算和显示 -->
+</html>

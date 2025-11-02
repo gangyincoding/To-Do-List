@@ -1,0 +1,281 @@
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>TaskAI - AI智能处理</title>
+    <script src="https://res.gemcoder.com/js/reload.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+                  theme: {
+                      extend: {
+                          colors: {
+                              primary: '#667eea',
+                              secondary: '#764ba2',
+                              success: '#10b981',
+                              processing: '#3b82f6',
+                              waiting: '#9ca3af',
+                          },
+                          spacing: {
+                              '160': '40rem',
+                          },
+                          boxShadow: {
+                              'button': '0 10px 25px -5px rgba(102, 126, 234, 0.4)',
+                          }
+                      }
+                  }
+              }
+    </script>
+    <style type="text/tailwindcss">
+      @layer utilities {
+          .content-auto {
+              content-visibility: auto;
+          }
+          .bg-gradient-primary {
+              background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          }
+          .text-shadow {
+              text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          }
+          .pulse-animation {
+              animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+          }
+          @keyframes pulse {
+              0%, 100% {
+                  opacity: 1;
+              }
+              50% {
+                  opacity: 0.5;
+              }
+          }
+          .progress-ring-circle {
+              transition: stroke-dashoffset 0.35s;
+              transform: rotate(-90deg);
+              transform-origin: 50% 50%;
+          }
+      }
+    </style>
+  </head>
+  <body class="bg-white min-h-screen flex flex-col">
+    <!-- [MODULE] abc_主内容区域 -->
+    <div class="flex flex-col h-screen">
+      <!-- [MODULE] d23_顶部导航栏 -->
+      <header class="h-16 flex items-center justify-center px-6">
+        <!-- [MODULE] 33f_顶部导航栏:应用标题 -->
+        <div class="flex items-center">
+          <span class="text-xl font-bold text-gray-800"> 🤖 AI智能处理中 </span>
+        </div>
+        <!-- [/MODULE] 33f_顶部导航栏:应用标题 -- 显示AI处理页面标题 -->
+      </header>
+      <!-- [/MODULE] d23_顶部导航栏 -- 极简设计的顶部标题区域 -->
+      <!-- [MODULE] e7h_中间处理区域 -->
+      <main
+        class="flex-grow flex flex-col items-center justify-center px-6 py-12"
+      >
+        <!-- [MODULE] f8j_中间处理区域:处理步骤列表 -->
+        <div class="w-full max-w-md mb-16">
+          <!-- [MODULE] a1b_处理步骤:语音识别 -->
+          <div class="flex items-center mb-8">
+            <div
+              class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mr-4 flex-shrink-0"
+            >
+              <i class="fas fa-volume-up text-success text-xl"> </i>
+            </div>
+            <div class="flex-grow">
+              <div class="flex justify-between items-center">
+                <span class="font-medium text-gray-800"> 语音识别 </span>
+                <span class="text-success font-medium"> ✓ 完成 </span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                <div
+                  class="bg-success h-2 rounded-full"
+                  style="width: 100%"
+                ></div>
+              </div>
+            </div>
+          </div>
+          <!-- [/MODULE] a1b_处理步骤:语音识别 -- 显示语音识别状态为已完成 -->
+          <!-- [MODULE] b2c_处理步骤:AI分析 -->
+          <div class="flex items-center mb-8">
+            <div
+              class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mr-4 flex-shrink-0"
+            >
+              <i class="fas fa-brain text-processing text-xl pulse-animation">
+              </i>
+            </div>
+            <div class="flex-grow">
+              <div class="flex justify-between items-center">
+                <span class="font-medium text-gray-800"> AI分析 </span>
+                <span class="text-processing font-medium flex items-center">
+                  <i class="fas fa-sync-alt mr-1 animate-spin"> </i>
+                  进行中...
+                </span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                <div
+                  class="bg-processing h-2 rounded-full"
+                  id="ai-analysis-progress"
+                  style="width: 65%"
+                ></div>
+              </div>
+            </div>
+          </div>
+          <!-- [/MODULE] b2c_处理步骤:AI分析 -- 显示AI分析状态为进行中，带动画效果 -->
+          <!-- [MODULE] c3d_处理步骤:任务拆分 -->
+          <div class="flex items-center mb-8">
+            <div
+              class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mr-4 flex-shrink-0"
+            >
+              <i class="fas fa-list text-waiting text-xl"> </i>
+            </div>
+            <div class="flex-grow">
+              <div class="flex justify-between items-center">
+                <span class="font-medium text-gray-800"> 任务拆分 </span>
+                <span class="text-waiting font-medium flex items-center">
+                  <i class="fas fa-hourglass-half mr-1"> </i>
+                  等待中
+                </span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                <div
+                  class="bg-waiting h-2 rounded-full"
+                  style="width: 0%"
+                ></div>
+              </div>
+            </div>
+          </div>
+          <!-- [/MODULE] c3d_处理步骤:任务拆分 -- 显示任务拆分状态为等待中 -->
+          <!-- [MODULE] d4e_处理步骤:完成保存 -->
+          <div class="flex items-center">
+            <div
+              class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mr-4 flex-shrink-0"
+            >
+              <i class="fas fa-check-circle text-waiting text-xl"> </i>
+            </div>
+            <div class="flex-grow">
+              <div class="flex justify-between items-center">
+                <span class="font-medium text-gray-800"> 完成保存 </span>
+                <span class="text-waiting font-medium flex items-center">
+                  <i class="fas fa-hourglass-half mr-1"> </i>
+                  等待中
+                </span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                <div
+                  class="bg-waiting h-2 rounded-full"
+                  style="width: 0%"
+                ></div>
+              </div>
+            </div>
+          </div>
+          <!-- [/MODULE] d4e_处理步骤:完成保存 -- 显示完成保存状态为等待中 -->
+        </div>
+        <!-- [/MODULE] f8j_中间处理区域:处理步骤列表 -- 垂直排列显示AI处理的四个步骤及各自状态 -->
+      </main>
+      <!-- [/MODULE] e7h_中间处理区域 -- 显示AI处理步骤和进度的主要内容区域 -->
+      <!-- [MODULE] g9k_底部进度区域 -->
+      <footer class="h-48 flex flex-col items-center justify-center px-6 mb-12">
+        <!-- [MODULE] h0l_底部进度区域:圆形进度指示器 -->
+        <div class="relative mb-6">
+          <svg class="w-32 h-32" viewBox="0 0 100 100">
+            <circle
+              cx="50"
+              cy="50"
+              r="45"
+              fill="none"
+              stroke="#e5e7eb"
+              stroke-width="8"
+            ></circle>
+            <circle
+              id="progress-circle"
+              class="progress-ring-circle"
+              cx="50"
+              cy="50"
+              r="45"
+              fill="none"
+              stroke="#3b82f6"
+              stroke-width="8"
+              stroke-dasharray="283"
+              stroke-dashoffset="99.05"
+            ></circle>
+          </svg>
+          <div
+            class="absolute inset-0 flex items-center justify-center flex-col"
+          >
+            <span
+              id="progress-percentage"
+              class="text-3xl font-bold text-gray-800"
+            >
+              65%
+            </span>
+            <span class="text-sm text-gray-500"> 处理进度 </span>
+          </div>
+        </div>
+        <!-- [/MODULE] h0l_底部进度区域:圆形进度指示器 -- 以环形进度条显示整体处理进度 -->
+        <!-- [MODULE] i1m_底部进度区域:提示信息 -->
+        <div class="text-center">
+          <div class="text-gray-600 font-medium mb-1">预计需要3-5秒</div>
+          <div class="text-gray-400 text-sm">AI正在分析您的语音...</div>
+        </div>
+        <!-- [/MODULE] i1m_底部进度区域:提示信息 -- 显示预计剩余时间和当前AI处理状态的文字说明 -->
+      </footer>
+      <!-- [/MODULE] g9k_底部进度区域 -- 包含圆形进度指示器和处理提示信息 -->
+    </div>
+    <!-- [/MODULE] abc_主内容区域 -- AI智能处理页面，展示处理进度和状态 -->
+    <!-- [JSMOD] j2n_进度动画功能 -->
+    <script id="progress-animation-script">
+      document.addEventListener('DOMContentLoaded', () => {
+                  // 获取DOM元素
+                  const aiAnalysisProgress = document.getElementById('ai-analysis-progress');
+                  const progressCircle = document.getElementById('progress-circle');
+                  const progressPercentage = document.getElementById('progress-percentage');
+
+                  // 初始进度值
+                  let currentProgress = 65;
+                  const targetProgress = 100;
+
+                  // 计算圆形进度条的周长
+                  const radius = progressCircle.r.baseVal.value;
+                  const circumference = radius * 2 * Math.PI;
+
+                  // 设置圆形进度条的初始状态
+                  progressCircle.style.strokeDasharray = `${circumference} ${circumference}`;
+
+                  // 模拟进度更新
+                  const progressInterval = setInterval(() => {
+                      currentProgress += 0.5;
+
+                      // 更新线性进度条
+                      aiAnalysisProgress.style.width = `${currentProgress}%`;
+
+                      // 更新圆形进度条
+                      const offset = circumference - (currentProgress / 100) * circumference;
+                      progressCircle.style.strokeDashoffset = offset;
+
+                      // 更新百分比文本
+                      progressPercentage.textContent = `${Math.round(currentProgress)}%`;
+
+                      // 当进度达到100%时，清除定时器并模拟完成状态
+                      if (currentProgress >= targetProgress) {
+                          clearInterval(progressInterval);
+
+                          // 模拟处理完成后跳转到结果页面
+                          setTimeout(() => {
+                              window.location.href = 'javascript:void(0);'; // 实际应用中应替换为结果页面URL
+                          }, 1000);
+                      }
+                  }, 50);
+
+                  // 监听窗口大小变化，调整元素位置和样式
+                  window.addEventListener('resize', () => {
+                      // 响应式调整逻辑
+                  });
+              });
+    </script>
+    <!-- [/JSMOD] j2n_进度动画功能 -- 实现AI处理进度的动画效果，包括线性进度条和圆形进度指示器的同步更新，以及进度完成后的页面跳转模拟 -->
+  </body>
+</html>

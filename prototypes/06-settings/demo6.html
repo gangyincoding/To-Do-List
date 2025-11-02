@@ -1,0 +1,576 @@
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>TaskAI - 设置</title>
+    <script src="https://res.gemcoder.com/js/reload.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+                  theme: {
+                      extend: {
+                          colors: {
+                              primary: '#667eea',
+                              secondary: '#764ba2',
+                              success: '#10b981',
+                              warning: '#f59e0b',
+                              danger: '#ef4444',
+                              info: '#3b82f6',
+                              light: '#f3f4f6',
+                              dark: '#1f2937'
+                          },
+                          spacing: {
+                              '160': '40rem',
+                          },
+                          boxShadow: {
+                              'card': '0 4px 12px rgba(0, 0, 0, 0.05)',
+                              'button': '0 10px 25px -5px rgba(102, 126, 234, 0.4)',
+                          }
+                      }
+                  }
+              }
+    </script>
+    <style type="text/tailwindcss">
+      @layer utilities {
+          .content-auto {
+              content-visibility: auto;
+          }
+          .bg-gradient-primary {
+              background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          }
+          .text-shadow {
+              text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          }
+          .setting-card {
+              @apply bg-white rounded-2xl shadow-card p-5 mb-6;
+          }
+          .toggle-switch {
+              @apply relative inline-block w-12 h-6 rounded-full transition-colors duration-300 cursor-pointer;
+          }
+          .toggle-dot {
+              @apply absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-300;
+          }
+          .toggle-switch.active {
+              @apply bg-primary;
+          }
+          .toggle-switch.active .toggle-dot {
+              @apply transform translate-x-6;
+          }
+          .toggle-switch.inactive {
+              @apply bg-gray-300;
+          }
+          .toggle-switch.inactive .toggle-dot {
+              @apply transform translate-x-0;
+          }
+          .star-rating {
+              @apply flex items-center;
+          }
+          .star {
+              @apply text-2xl cursor-pointer transition-colors duration-200 mx-1;
+          }
+          .star.active {
+              @apply text-yellow-400;
+          }
+          .star.inactive {
+              @apply text-gray-300;
+          }
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 min-h-screen flex flex-col">
+    <!-- [MODULE] abc_主内容区域 -->
+    <div class="flex flex-col h-screen">
+      <!-- [MODULE] d23_顶部导航栏 -->
+      <header
+        class="h-16 flex items-center justify-between px-6 border-b border-gray-100 bg-white"
+      >
+        <!-- [MODULE] 56h_顶部导航栏:返回按钮 -->
+        <div>
+          <button
+            class="text-gray-500 hover:text-gray-800 transition-colors"
+            id="back-button"
+          >
+            <i class="fas fa-arrow-left text-lg"> </i>
+          </button>
+        </div>
+        <!-- [/MODULE] 56h_顶部导航栏:返回按钮 -- 点击返回到上一个页面 -->
+        <!-- [MODULE] 33f_顶部导航栏:页面标题 -->
+        <div class="flex items-center">
+          <span class="text-xl font-bold mr-2"> ⚙️ </span>
+          <span class="text-xl font-bold text-gray-800"> 设置 </span>
+        </div>
+        <!-- [/MODULE] 33f_顶部导航栏:页面标题 -- 显示设置页面标题 -->
+        <!-- [MODULE] 45g_顶部导航栏:空白占位 -->
+        <div class="w-8"></div>
+        <!-- [/MODULE] 45g_顶部导航栏:空白占位 -- 保持标题居中对齐 -->
+      </header>
+      <!-- [/MODULE] d23_顶部导航栏 -- 包含返回按钮和页面标题 -->
+      <!-- [MODULE] e7h_中间内容区域 -->
+      <main class="flex-grow overflow-y-auto px-6 py-4 bg-gray-50">
+        <!-- [MODULE] f8j_中间内容区域:API配置状态 -->
+        <div class="setting-card">
+          <div class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+            <i class="fas fa-wrench text-primary mr-2"> </i>
+            API连接状态
+          </div>
+          <!-- [MODULE] a1b_API配置状态:语音识别 -->
+          <div class="mb-6 pb-6 border-b border-gray-100">
+            <div class="font-medium text-gray-800 mb-2 flex items-center">
+              <i class="fas fa-microphone text-primary mr-2"> </i>
+              语音识别
+            </div>
+            <div class="ml-6">
+              <div class="flex justify-between items-center mb-1">
+                <span class="text-gray-600"> 科大讯飞 </span>
+                <span class="text-success flex items-center">
+                  <i class="fas fa-check-circle mr-1"> </i>
+                  已连接
+                </span>
+              </div>
+              <div class="text-sm text-gray-500 mb-1">API状态：正常</div>
+              <div class="text-sm text-gray-500 mb-3">状态码：200</div>
+              <div class="flex space-x-2">
+                <button
+                  class="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 transition-colors"
+                >
+                  测试连接
+                </button>
+                <button
+                  class="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 transition-colors"
+                >
+                  重新配置
+                </button>
+              </div>
+            </div>
+          </div>
+          <!-- [/MODULE] a1b_API配置状态:语音识别 -- 显示语音识别API的连接状态和相关操作按钮 -->
+          <!-- [MODULE] c2d_API配置状态:AI模型 -->
+          <div>
+            <div class="font-medium text-gray-800 mb-2 flex items-center">
+              <i class="fas fa-brain text-primary mr-2"> </i>
+              AI模型
+            </div>
+            <div class="ml-6">
+              <div class="flex justify-between items-center mb-1">
+                <span class="text-gray-600"> 百度千帆 </span>
+                <span class="text-success flex items-center">
+                  <i class="fas fa-check-circle mr-1"> </i>
+                  已连接
+                </span>
+              </div>
+              <div class="text-sm text-gray-500 mb-1">模型：ERNIE-Speed-8K</div>
+              <div class="text-sm text-gray-500 mb-3">状态：正常运行</div>
+              <div class="flex space-x-2">
+                <button
+                  class="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 transition-colors"
+                >
+                  测试连接
+                </button>
+                <button
+                  class="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 transition-colors"
+                >
+                  切换模型
+                </button>
+              </div>
+            </div>
+          </div>
+          <!-- [/MODULE] c2d_API配置状态:AI模型 -- 显示AI模型的连接状态和相关操作按钮 -->
+        </div>
+        <!-- [/MODULE] f8j_中间内容区域:API配置状态 -- 显示API连接状态信息，包括语音识别和AI模型的连接状态、状态码和操作按钮 -->
+        <!-- [MODULE] g9k_中间内容区域:用户偏好设置 -->
+        <div class="setting-card">
+          <div class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+            <i class="fas fa-palette text-primary mr-2"> </i>
+            偏好设置
+          </div>
+          <!-- [MODULE] h0i_用户偏好设置:任务拆分程度 -->
+          <div class="mb-6 pb-6 border-b border-gray-100">
+            <div class="font-medium text-gray-800 mb-3">任务拆分程度</div>
+            <div class="star-rating" id="split-degree">
+              <i class="star active fas fa-star" data-value="1"> </i>
+              <i class="star active fas fa-star" data-value="2"> </i>
+              <i class="star active fas fa-star" data-value="3"> </i>
+              <i class="star inactive far fa-star" data-value="4"> </i>
+              <i class="star inactive far fa-star" data-value="5"> </i>
+            </div>
+            <div class="text-center mt-2 text-sm text-gray-500">中等</div>
+          </div>
+          <!-- [/MODULE] h0i_用户偏好设置:任务拆分程度 -- 通过星级评分设置任务拆分的详细程度，从简单到复杂 -->
+          <!-- [MODULE] j1k_用户偏好设置:提醒方式 -->
+          <div class="mb-6 pb-6 border-b border-gray-100">
+            <div class="flex justify-between items-center">
+              <div class="font-medium text-gray-800 flex items-center">
+                <i class="fas fa-bell text-primary mr-2"> </i>
+                提醒方式
+              </div>
+              <div class="flex items-center">
+                <span class="mr-2 text-gray-600"> 开启 </span>
+                <div class="toggle-switch active" id="reminder-toggle">
+                  <div class="toggle-dot"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- [/MODULE] j1k_用户偏好设置:提醒方式 -- 开关控制是否开启任务提醒功能 -->
+          <!-- [MODULE] l2m_用户偏好设置:深色模式 -->
+          <div class="mb-6 pb-6 border-b border-gray-100">
+            <div class="flex justify-between items-center">
+              <div class="font-medium text-gray-800 flex items-center">
+                <i class="fas fa-moon text-primary mr-2"> </i>
+                深色模式
+              </div>
+              <div class="flex items-center">
+                <span class="mr-2 text-gray-600"> 关闭 </span>
+                <div class="toggle-switch inactive" id="dark-mode-toggle">
+                  <div class="toggle-dot"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- [/MODULE] l2m_用户偏好设置:深色模式 -- 开关控制是否启用深色显示模式 -->
+          <!-- [MODULE] n3o_用户偏好设置:数据同步 -->
+          <div class="mb-6 pb-6 border-b border-gray-100">
+            <div class="flex justify-between items-center">
+              <div class="font-medium text-gray-800 flex items-center">
+                <i class="fas fa-cloud-sync-alt text-primary mr-2"> </i>
+                数据同步
+              </div>
+              <div class="flex items-center">
+                <span class="mr-2 text-gray-600"> 自动同步 </span>
+                <div class="toggle-switch active" id="sync-toggle">
+                  <div class="toggle-dot"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- [/MODULE] n3o_用户偏好设置:数据同步 -- 开关控制是否自动同步任务数据到云端 -->
+          <!-- [MODULE] p4q_用户偏好设置:任务默认优先级 -->
+          <div>
+            <div class="font-medium text-gray-800 mb-3 flex items-center">
+              <i class="fas fa-flag text-primary mr-2"> </i>
+              任务默认优先级
+            </div>
+            <div class="relative">
+              <select
+                class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 appearance-none focus:outline-none focus:ring-2 focus:ring-primary/50 text-gray-700"
+              >
+                <option>低</option>
+                <option selected>中等</option>
+                <option>高</option>
+                <option>紧急</option>
+              </select>
+              <div
+                class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none"
+              >
+                <i class="fas fa-chevron-down text-gray-400"> </i>
+              </div>
+            </div>
+          </div>
+          <!-- [/MODULE] p4q_用户偏好设置:任务默认优先级 -- 下拉选择新创建任务的默认优先级 -->
+        </div>
+        <!-- [/MODULE] g9k_用户偏好设置 -- 包含任务拆分程度、提醒方式、深色模式、数据同步和任务默认优先级等用户个性化设置 -->
+        <!-- [MODULE] r5s_中间内容区域:使用统计 -->
+        <div class="setting-card">
+          <div class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+            <i class="fas fa-chart-bar text-primary mr-2"> </i>
+            使用统计
+          </div>
+          <div class="space-y-3 mb-4">
+            <div class="flex justify-between">
+              <span class="text-gray-600"> 本月完成： </span>
+              <span class="font-medium text-gray-800"> 45个任务 </span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600"> AI拆分： </span>
+              <span class="font-medium text-gray-800"> 38次 </span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600"> 平均效率： </span>
+              <span class="font-medium text-gray-800"> 85% </span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600"> 使用天数： </span>
+              <span class="font-medium text-gray-800"> 23天 </span>
+            </div>
+          </div>
+          <button
+            class="w-full py-2 border border-primary text-primary rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors"
+          >
+            查看详细统计
+          </button>
+        </div>
+        <!-- [/MODULE] r5s_中间内容区域:使用统计 -- 显示应用使用情况的统计数据，包括完成任务数、AI拆分次数等 -->
+        <!-- [MODULE] t6u_中间内容区域:帮助与反馈 -->
+        <div class="setting-card">
+          <div class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+            <i class="fas fa-question-circle text-primary mr-2"> </i>
+            帮助与反馈
+          </div>
+          <div class="space-y-1">
+            <a
+              href="javascript:void(0);"
+              class="block py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors flex items-center"
+            >
+              <i class="fas fa-book text-gray-500 mr-3 w-5 text-center"> </i>
+              <span class="text-gray-800"> 使用指南 </span>
+              <i class="fas fa-chevron-right text-gray-400 ml-auto"> </i>
+            </a>
+            <a
+              href="javascript:void(0);"
+              class="block py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors flex items-center"
+            >
+              <i class="fas fa-comment-alt text-gray-500 mr-3 w-5 text-center">
+              </i>
+              <span class="text-gray-800"> 问题反馈 </span>
+              <i class="fas fa-chevron-right text-gray-400 ml-auto"> </i>
+            </a>
+            <a
+              href="javascript:void(0);"
+              class="block py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors flex items-center"
+            >
+              <i class="fas fa-file-privacy text-gray-500 mr-3 w-5 text-center">
+              </i>
+              <span class="text-gray-800"> 隐私政策 </span>
+              <i class="fas fa-chevron-right text-gray-400 ml-auto"> </i>
+            </a>
+            <a
+              href="javascript:void(0);"
+              class="block py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors flex items-center"
+            >
+              <i class="fas fa-info-circle text-gray-500 mr-3 w-5 text-center">
+              </i>
+              <span class="text-gray-800"> 关于TaskAI </span>
+              <i class="fas fa-chevron-right text-gray-400 ml-auto"> </i>
+            </a>
+            <a
+              href="javascript:void(0);"
+              class="block py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors flex items-center"
+            >
+              <i class="fas fa-envelope text-gray-500 mr-3 w-5 text-center">
+              </i>
+              <span class="text-gray-800"> 联系我们 </span>
+              <i class="fas fa-chevron-right text-gray-400 ml-auto"> </i>
+            </a>
+          </div>
+          <div class="mt-6 pt-6 border-t border-gray-100">
+            <div class="font-medium text-gray-800 mb-1">版本信息</div>
+            <div class="text-sm text-gray-500 mb-1">当前版本：1.0.0</div>
+            <div class="text-sm text-gray-500 mb-3">最后更新：2024年11月</div>
+            <button
+              class="w-full py-2 border border-primary text-primary rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors"
+            >
+              检查更新
+            </button>
+          </div>
+        </div>
+        <!-- [/MODULE] t6u_中间内容区域:帮助与反馈 -- 提供使用指南、问题反馈、隐私政策等链接和应用版本信息 -->
+      </main>
+      <!-- [/MODULE] e7h_中间内容区域 -- 包含API配置状态、用户偏好设置、使用统计和帮助与反馈等设置内容 -->
+      <!-- [MODULE] v7w_底部操作区域 -->
+      <footer
+        class="h-16 flex items-center justify-around px-6 border-t border-gray-100 bg-white"
+      >
+        <button
+          class="flex-1 py-2 mx-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
+          id="reset-settings"
+        >
+          <i class="fas fa-redo-alt mr-1"> </i>
+          恢复默认
+        </button>
+        <button
+          class="flex-1 py-2 mx-2 bg-gradient-primary text-white rounded-lg text-sm font-medium shadow-button hover:opacity-90 transition-opacity"
+          id="save-settings"
+        >
+          <i class="fas fa-save mr-1"> </i>
+          保存设置
+        </button>
+      </footer>
+      <!-- [/MODULE] v7w_底部操作区域 -- 包含保存设置和恢复默认设置的操作按钮 -->
+    </div>
+    <!-- [/MODULE] abc_主内容区域 -- TaskAI应用设置页面，包含API配置、偏好设置、使用统计和帮助反馈等功能模块 -->
+    <!-- [JSMOD] x8y_设置页面交互功能 -->
+    <script id="settings-script">
+      document.addEventListener('DOMContentLoaded', () => {
+                  // 返回按钮功能
+                  const backButton = document.getElementById('back-button');
+                  backButton.addEventListener('click', () => {
+                      // 在实际应用中，这里会使用history.back()或导航到特定页面
+                      alert('返回到上一页');
+                  });
+
+                  // 任务拆分程度星级评分功能
+                  const stars = document.querySelectorAll('#split-degree .star');
+                  const splitDegreeText = document.querySelector('#split-degree + div');
+
+                  stars.forEach(star => {
+                      star.addEventListener('mouseover', () => {
+                          const value = parseInt(star.getAttribute('data-value'));
+                          updateStars(value, true);
+                      });
+
+                      star.addEventListener('mouseout', () => {
+                          // 找出当前激活的星星数量
+                          const activeStars = document.querySelectorAll('#split-degree .star.active');
+                          const value = activeStars.length;
+                          updateStars(value, false);
+                      });
+
+                      star.addEventListener('click', () => {
+                          const value = parseInt(star.getAttribute('data-value'));
+                          updateStars(value, false);
+                          updateSplitDegreeText(value);
+                      });
+                  });
+
+                  function updateStars(count, isPreview) {
+                      stars.forEach(star => {
+                          const value = parseInt(star.getAttribute('data-value'));
+                          if (value <= count) {
+                              star.classList.remove('inactive', 'far');
+                              star.classList.add('active', 'fas');
+                          } else {
+                              star.classList.remove('active', 'fas');
+                              star.classList.add('inactive', 'far');
+                          }
+
+                          // 如果是预览状态，添加特殊样式
+                          if (isPreview && value <= count) {
+                              star.classList.add('text-yellow-300');
+                          } else {
+                              star.classList.remove('text-yellow-300');
+                          }
+                      });
+                  }
+
+                  function updateSplitDegreeText(count) {
+                      let text = '';
+                      switch(count) {
+                          case 1: text = '简单'; break;
+                          case 2: text = '较简单'; break;
+                          case 3: text = '中等'; break;
+                          case 4: text = '较复杂'; break;
+                          case 5: text = '复杂'; break;
+                      }
+                      splitDegreeText.textContent = text;
+                  }
+
+                  // 开关切换功能
+                  const toggles = document.querySelectorAll('.toggle-switch');
+
+                  toggles.forEach(toggle => {
+                      toggle.addEventListener('click', () => {
+                          toggle.classList.toggle('active');
+                          toggle.classList.toggle('inactive');
+
+                          // 更新对应的文本状态
+                          const parent = toggle.parentElement;
+                          const textElement = parent.querySelector('span');
+
+                          if (toggle.classList.contains('active')) {
+                              // 根据不同的开关更新不同的文本
+                              if (toggle.id === 'reminder-toggle') {
+                                  textElement.textContent = '开启';
+                              } else if (toggle.id === 'dark-mode-toggle') {
+                                  textElement.textContent = '开启';
+                                  document.body.classList.add('dark-mode');
+                              } else if (toggle.id === 'sync-toggle') {
+                                  textElement.textContent = '自动同步';
+                              }
+                          } else {
+                              if (toggle.id === 'reminder-toggle') {
+                                  textElement.textContent = '关闭';
+                              } else if (toggle.id === 'dark-mode-toggle') {
+                                  textElement.textContent = '关闭';
+                                  document.body.classList.remove('dark-mode');
+                              } else if (toggle.id === 'sync-toggle') {
+                                  textElement.textContent = '关闭';
+                              }
+                          }
+                      });
+                  });
+
+                  // 保存设置功能
+                  const saveButton = document.getElementById('save-settings');
+                  saveButton.addEventListener('click', () => {
+                      // 模拟保存设置
+                      const saveNotification = document.createElement('div');
+                      saveNotification.className = 'fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+                      saveNotification.textContent = '设置已保存';
+
+                      document.body.appendChild(saveNotification);
+
+                      setTimeout(() => {
+                          saveNotification.classList.add('opacity-0', 'transition-opacity', 'duration-500');
+                          setTimeout(() => {
+                              document.body.removeChild(saveNotification);
+                          }, 500);
+                      }, 2000);
+                  });
+
+                  // 恢复默认设置功能
+                  const resetButton = document.getElementById('reset-settings');
+                  resetButton.addEventListener('click', () => {
+                      if (confirm('确定要恢复默认设置吗？这将清除您所有的自定义设置。')) {
+                          // 重置星级评分
+                          updateStars(3, false);
+                          updateSplitDegreeText(3);
+
+                          // 重置开关状态
+                          document.getElementById('reminder-toggle').classList.add('active');
+                          document.getElementById('reminder-toggle').classList.remove('inactive');
+                          document.querySelector('#reminder-toggle ~ span').textContent = '开启';
+
+                          document.getElementById('dark-mode-toggle').classList.add('inactive');
+                          document.getElementById('dark-mode-toggle').classList.remove('active');
+                          document.querySelector('#dark-mode-toggle ~ span').textContent = '关闭';
+
+                          document.getElementById('sync-toggle').classList.add('active');
+                          document.getElementById('sync-toggle').classList.remove('inactive');
+                          document.querySelector('#sync-toggle ~ span').textContent = '自动同步';
+
+                          // 重置下拉选择
+                          const prioritySelect = document.querySelector('select');
+                          prioritySelect.value = '中等';
+
+                          // 显示重置通知
+                          const resetNotification = document.createElement('div');
+                          resetNotification.className = 'fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+                          resetNotification.textContent = '已恢复默认设置';
+
+                          document.body.appendChild(resetNotification);
+
+                          setTimeout(() => {
+                              resetNotification.classList.add('opacity-0', 'transition-opacity', 'duration-500');
+                              setTimeout(() => {
+                                  document.body.removeChild(resetNotification);
+                              }, 500);
+                          }, 2000);
+                      }
+                  });
+
+                  // 更新拆分程度文本描述
+                  function updateSplitDegreeText(value) {
+                      let text = '';
+                      switch(value) {
+                          case 1: text = '简单'; break;
+                          case 2: text = '较简单'; break;
+                          case 3: text = '中等'; break;
+                          case 4: text = '较复杂'; break;
+                          case 5: text = '复杂'; break;
+                      }
+                      splitDegreeText.textContent = text;
+                  }
+
+                  // 监听窗口大小变化，调整元素位置
+                  window.addEventListener('resize', () => {
+                      // 可以在这里添加响应式调整逻辑
+                  });
+              });
+    </script>
+    <!-- [/JSMOD] x8y_设置页面交互功能 -- 实现设置页面的各种交互功能，包括返回按钮、星级评分、开关切换、保存设置和恢复默认设置等 -->
+  </body>
+</html>
